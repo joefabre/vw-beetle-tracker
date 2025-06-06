@@ -212,6 +212,109 @@ function toggleIssueStatus(id) {
     }
 }
 
+// Edit an issue
+function startEditIssue(id) {
+    const issue = store.issues.find(issue => issue.id === id);
+    if (!issue) return;
+    
+    // Find the issue element
+    const issueElement = document.querySelector(`[data-issue-id="${id}"]`);
+    if (!issueElement) return;
+    
+    // Store original content for canceling
+    issueElement.dataset.originalContent = issueElement.innerHTML;
+    
+    // Create edit form
+    const editForm = `
+        <div class="issue-edit-form">
+            <div class="form-group">
+                <label for="edit-date-${id}">Date Noticed:</label>
+                <input type="date" id="edit-date-${id}" value="${issue.date}" required>
+            </div>
+            <div class="form-group">
+                <label for="edit-description-${id}">Description:</label>
+                <textarea id="edit-description-${id}" rows="3" required>${issue.description}</textarea>
+            </div>
+            <div class="form-group">
+                <label for="edit-priority-${id}">Priority:</label>
+                <select id="edit-priority-${id}" required>
+                    <option value="low" ${issue.priority === 'low' ? 'selected' : ''}>Low</option>
+                    <option value="medium" ${issue.priority === 'medium' ? 'selected' : ''}>Medium</option>
+                    <option value="high" ${issue.priority === 'high' ? 'selected' : ''}>High</option>
+                    <option value="critical" ${issue.priority === 'critical' ? 'selected' : ''}>Critical</option>
+                </select>
+            </div>
+            <div class="issue-edit-actions">
+                <button class="btn-small btn-save" data-action="save-edit" data-id="${id}">
+                    <i class="fas fa-save"></i> Save
+                </button>
+                <button class="btn-small btn-cancel" data-action="cancel-edit" data-id="${id}">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+            </div>
+        </div>
+    `;
+    
+    // Replace content with edit form
+    issueElement.innerHTML = editForm;
+    issueElement.classList.add('editing');
+    
+    // Attach event listeners to edit form buttons
+    issueElement.querySelector('button[data-action="save-edit"]').addEventListener('click', (e) => {
+        const id = e.currentTarget.getAttribute('data-id');
+        saveEditIssue(id);
+    });
+    
+    issueElement.querySelector('button[data-action="cancel-edit"]').addEventListener('click', (e) => {
+        const id = e.currentTarget.getAttribute('data-id');
+        cancelEditIssue(id);
+    });
+}
+
+// Save edited issue
+function saveEditIssue(id) {
+    const issue = store.issues.find(issue => issue.id === id);
+    if (!issue) return;
+    
+    // Get form values
+    const date = document.getElementById(`edit-date-${id}`).value;
+    const description = document.getElementById(`edit-description-${id}`).value.trim();
+    const priority = document.getElementById(`edit-priority-${id}`).value;
+    
+    // Validate required fields
+    if (!date || !description) {
+        showNotification('Please fill in all required fields', 'error');
+        return;
+    }
+    
+    // Update issue
+    issue.date = date;
+    issue.description = description;
+    issue.priority = priority;
+    issue.lastModified = new Date().toISOString();
+    
+    saveToStorage();
+    renderIssues();
+    
+    showNotification('Issue updated successfully!', 'success');
+}
+
+// Cancel editing issue
+function cancelEditIssue(id) {
+    const issueElement = document.querySelector(`[data-issue-id="${id}"]`);
+    if (!issueElement) return;
+    
+    // Restore original content
+    const originalContent = issueElement.dataset.originalContent;
+    if (originalContent) {
+        issueElement.innerHTML = originalContent;
+        issueElement.classList.remove('editing');
+        
+        // Re-attach event listeners
+        attachIssueEventListeners(issueElement);
+    }
+}
+
 // Delete an issue
 function deleteIssue(id) {
     if (confirm('Are you sure you want to delete this issue?')) {
@@ -253,12 +356,46 @@ function renderIssues() {
     }
 }
 
+// Attach event listeners to an issue element
+function attachIssueEventListeners(issueElement) {
+    const toggleBtn = issueElement.querySelector('button[data-action="toggle"]');
+    const editBtn = issueElement.querySelector('button[data-action="edit-issue"]');
+    const deleteBtn = issueElement.querySelector('button[data-action="delete-issue"]');
+    
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', (e) => {
+            const id = e.currentTarget.getAttribute('data-id');
+            toggleIssueStatus(id);
+        });
+    }
+    
+    if (editBtn) {
+        editBtn.addEventListener('click', (e) => {
+            const id = e.currentTarget.getAttribute('data-id');
+            startEditIssue(id);
+        });
+    }
+    
+    if (deleteBtn) {
+        deleteBtn.addEventListener('click', (e) => {
+            const id = e.currentTarget.getAttribute('data-id');
+            deleteIssue(id);
+        });
+    }
+}
+
 // Create an issue list item element
 function createIssueElement(issue) {
     const li = document.createElement('li');
     li.className = `issue-item ${issue.priority}`;
+    li.setAttribute('data-issue-id', issue.id);
     
     const formattedDate = new Date(issue.date).toLocaleDateString();
+    
+    // Create the updated timestamp if it exists
+    const updatedTimestamp = issue.lastModified 
+        ? `<div class="issue-updated">Updated: ${new Date(issue.lastModified).toLocaleDateString()}</div>`
+        : '';
     
     li.innerHTML = `
         <div class="issue-header">
@@ -270,22 +407,18 @@ function createIssueElement(issue) {
             <button class="btn-small" data-action="toggle" data-id="${issue.id}">
                 ${issue.resolved ? '<i class="fas fa-undo"></i> Reopen' : '<i class="fas fa-check"></i> Resolve'}
             </button>
-            <button class="btn-small" data-action="delete-issue" data-id="${issue.id}">
+            <button class="btn-small btn-edit" data-action="edit-issue" data-id="${issue.id}">
+                <i class="fas fa-edit"></i> Edit
+            </button>
+            <button class="btn-small btn-delete" data-action="delete-issue" data-id="${issue.id}">
                 <i class="fas fa-trash"></i> Delete
             </button>
         </div>
+        ${updatedTimestamp}
     `;
     
     // Attach event listeners
-    li.querySelector('button[data-action="toggle"]').addEventListener('click', (e) => {
-        const id = e.currentTarget.getAttribute('data-id');
-        toggleIssueStatus(id);
-    });
-    
-    li.querySelector('button[data-action="delete-issue"]').addEventListener('click', (e) => {
-        const id = e.currentTarget.getAttribute('data-id');
-        deleteIssue(id);
-    });
+    attachIssueEventListeners(li);
     
     return li;
 }

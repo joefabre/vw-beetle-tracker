@@ -684,6 +684,125 @@ tbody tr:hover {
 .issue-actions {
     display: flex;
     gap: var(--spacing-sm);
+    flex-wrap: wrap;
+}
+
+.issue-updated {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-align: right;
+    margin-top: var(--spacing-sm);
+    font-style: italic;
+}
+
+/* Issue edit form styles */
+.issue-edit-form {
+    padding: var(--spacing-md);
+    background-color: var(--light-bg);
+    border-radius: var(--border-radius);
+    margin-top: var(--spacing-sm);
+}
+
+.issue-edit-form .form-group {
+    margin-bottom: var(--spacing-md);
+}
+
+.issue-edit-form label {
+    display: block;
+    margin-bottom: var(--spacing-xs);
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.issue-edit-form input,
+.issue-edit-form select,
+.issue-edit-form textarea {
+    width: 100%;
+    padding: var(--spacing-sm);
+    font-size: 0.95rem;
+    border: 1px solid var(--light-border);
+    border-radius: var(--border-radius);
+    font-family: inherit;
+}
+
+.issue-edit-form textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.issue-edit-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-md);
+    justify-content: flex-end;
+}
+
+.btn-save {
+    background-color: var(--status-completed);
+}
+
+.btn-save:hover {
+    background-color: #1e7e34;
+}
+
+.btn-cancel {
+    background-color: var(--text-muted);
+}
+
+.btn-cancel:hover {
+    background-color: #5a6268;
+}
+
+.btn-edit {
+    background-color: #6495ED; /* Cornflower blue */
+}
+
+.btn-edit:hover {
+    background-color: #4169E1; /* Royal blue for hover */
+}
+
+.btn-delete {
+    background-color: var(--status-overdue);
+}
+
+.btn-delete:hover {
+    background-color: #c82333;
+}
+
+/* Editing state styles */
+.issue-item.editing {
+    border-left-color: var(--secondary);
+    background-color: rgba(211, 84, 0, 0.05);
+}
+
+/* Touch-friendly edit form for mobile */
+@media (max-width: 767px) {
+    .issue-edit-form input,
+    .issue-edit-form select,
+    .issue-edit-form textarea {
+        padding: var(--spacing-md);
+        font-size: 16px; /* Prevents zoom on focus in iOS */
+    }
+    
+    .issue-edit-actions {
+        flex-direction: column;
+    }
+    
+    .issue-edit-actions .btn-small {
+        width: 100%;
+        min-height: 44px;
+        margin-bottom: var(--spacing-sm);
+    }
+    
+    .issue-actions {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+    }
+    
+    .issue-actions .btn-small {
+        width: 100%;
+        min-height: 44px;
+    }
 }
 
 .issue-list.resolved .issue-item {
