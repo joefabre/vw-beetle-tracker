@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>1969 VW Beetle Maintenance Tracker</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <h1>1969 VW Beetle Maintenance Tracker</h1>
+        <p>Keep track of maintenance, repairs, and issues for your classic Beetle</p>
+    </header>
+    
+    <main>
+        <section id="vehicle-info" class="card">
+            <h2>Vehicle Information</h2>
+            <div class="info-container">
+                <div class="info-item">
+                    <label for="year">Year:</label>
+                    <input type="text" id="year" value="1969" readonly>
+                </div>
+                <div class="info-item">
+                    <label for="make">Make:</label>
+                    <input type="text" id="make" value="Volkswagen" readonly>
+                </div>
+                <div class="info-item">
+                    <label for="model">Model:</label>
+                    <input type="text" id="model" value="Beetle" readonly>
+                </div>
+                <div class="info-item">
+                    <label for="vin">VIN/Chassis Number:</label>
+                    <input type="text" id="vin" placeholder="Enter VIN or chassis number">
+                </div>
+                <div class="info-item">
+                    <label for="current-mileage">Current Mileage:</label>
+                    <input type="number" id="current-mileage" placeholder="Enter current odometer reading">
+                </div>
+                <button id="save-info" class="btn">Save Information</button>
+            </div>
+        </section>
+
+        <section id="maintenance-log" class="card">
+            <h2>Maintenance Log</h2>
+            <form id="maintenance-form">
+                <div class="form-group">
+                    <label for="maintenance-date">Date:</label>
+                    <input type="date" id="maintenance-date" required>
+                </div>
+                <div class="form-group">
+                    <label for="maintenance-type">Type:</label>
+                    <select id="maintenance-type" required>
+                        <option value="">Select Type</option>
+                        <option value="oil-change">Oil Change</option>
+                        <option value="tune-up">Tune-Up</option>
+                        <option value="brakes">Brakes</option>
+                        <option value="electrical">Electrical</option>
+                        <option value="engine">Engine</option>
+                        <option value="transmission">Transmission</option>
+                        <option value="suspension">Suspension</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="maintenance-mileage">Mileage:</label>
+                    <input type="number" id="maintenance-mileage" required>
+                </div>
+                <div class="form-group">
+                    <label for="maintenance-notes">Notes:</label>
+                    <textarea id="maintenance-notes" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="maintenance-cost">Cost ($):</label>
+                    <input type="number" id="maintenance-cost" step="0.01" min="0">
+                </div>
+                <button type="submit" class="btn">Add Maintenance Record</button>
+            </form>
+
+            <div class="filter-section">
+                <h3>Filter Records</h3>
+                <div class="filter-controls">
+                    <select id="filter-type">
+                        <option value="all">All Types</option>
+                        <option value="oil-change">Oil Change</option>
+                        <option value="tune-up">Tune-Up</option>
+                        <option value="brakes">Brakes</option>
+                        <option value="electrical">Electrical</option>
+                        <option value="engine">Engine</option>
+                        <option value="transmission">Transmission</option>
+                        <option value="suspension">Suspension</option>
+                        <option value="other">Other</option>
+                    </select>
+                    <button id="apply-filter" class="btn-small">Apply Filter</button>
+                    <button id="clear-filter" class="btn-small">Clear Filter</button>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table id="maintenance-table" class="responsive-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Type</th>
+                            <th>Mileage</th>
+                            <th>Notes</th>
+                            <th>Cost</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="maintenance-entries">
+                        <!-- Maintenance entries will be added here dynamically -->
+                        <!-- Example row for demonstration (will be replaced by JavaScript) -->
+                        <tr class="example-row" style="display: none;">
+                            <td data-label="Date">2025-05-30</td>
+                            <td data-label="Type">Oil Change</td>
+                            <td data-label="Mileage">85,432</td>
+                            <td data-label="Notes">Regular maintenance</td>
+                            <td data-label="Cost">$45.00</td>
+                            <td data-label="Actions"><button class="btn-small">Edit</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="issue-tracking" class="card">
+            <h2>Issue Tracking</h2>
+            <form id="issue-form">
+                <div class="form-group">
+                    <label for="issue-date">Date Noticed:</label>
+                    <input type="date" id="issue-date" required>
+                </div>
+                <div class="form-group">
+                    <label for="issue-description">Description:</label>
+                    <textarea id="issue-description" rows="3" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="issue-priority">Priority:</label>
+                    <select id="issue-priority" required>
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                        <option value="critical">Critical</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn">Add Issue</button>
+            </form>
+
+            <div class="issue-list-container">
+                <h3>Current Issues</h3>
+                <ul id="issue-list" class="issue-list">
+                    <!-- Issues will be added here dynamically -->
+                </ul>
+            </div>
+
+            <div class="issue-list-container">
+                <h3>Resolved Issues</h3>
+                <ul id="resolved-issue-list" class="issue-list resolved">
+                    <!-- Resolved issues will be added here dynamically -->
+                </ul>
+            </div>
+
+            <div class="export-section">
+                <h3>Export Issues</h3>
+                <div class="export-controls">
+                    <button id="print-issues" class="btn-small touch-friendly">
+                        <i class="fas fa-print"></i> Print Issues
+                    </button>
+                    <button id="email-issues" class="btn-small touch-friendly">
+                        <i class="fas fa-envelope"></i> Email Issues
+                    </button>
+                    <button id="export-issues-csv" class="btn-small touch-friendly">
+                        <i class="fas fa-file-csv"></i> Export to CSV
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section id="service-schedule" class="card">
+            <h2>Service Schedule</h2>
+            <div class="service-schedule-wrapper">
+                <div class="schedule-container table-container">
+                    <table id="schedule-table" class="responsive-table">
+                        <thead>
+                            <tr>
+                                <th>Service</th>
+                                <th>Interval</th>
+                                <th>Last Done</th>
+                                <th>Next Due</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="schedule-row">
+                                <td data-label="Service">Oil Change</td>
+                                <td data-label="Interval">3,000 miles</td>
+                                <td data-label="Last Done"><input type="date" id="oil-last" class="date-input touch-friendly" aria-label="Last Oil Change Date"></td>
+                                <td data-label="Next Due"><input type="date" id="oil-next" class="date-input touch-friendly" aria-label="Next Oil Change Due Date"></td>
+                                <td data-label="Status" id="oil-status"><span class="status status-mobile unknown">Unknown</span></td>
+                            </tr>
+                            <tr class="schedule-row">
+                                <td data-label="Service">Valve Adjustment</td>
+                                <td data-label="Interval">6,000 miles</td>
+                                <td data-label="Last Done"><input type="date" id="valve-last" class="date-input touch-friendly" aria-label="Last Valve Adjustment Date"></td>
+                                <td data-label="Next Due"><input type="date" id="valve-next" class="date-input touch-friendly" aria-label="Next Valve Adjustment Due Date"></td>
+                                <td data-label="Status" id="valve-status"><span class="status status-mobile unknown">Unknown</span></td>
+                            </tr>
+                            <tr class="schedule-row">
+                                <td data-label="Service">Tune-Up</td>
+                                <td data-label="Interval">12,000 miles</td>
+                                <td data-label="Last Done"><input type="date" id="tune-last" class="date-input touch-friendly" aria-label="Last Tune-Up Date"></td>
+                                <td data-label="Next Due"><input type="date" id="tune-next" class="date-input touch-friendly" aria-label="Next Tune-Up Due Date"></td>
+                                <td data-label="Status" id="tune-status"><span class="status status-mobile unknown">Unknown</span></td>
+                            </tr>
+                            <tr class="schedule-row">
+                                <td data-label="Service">Brake Inspection</td>
+                                <td data-label="Interval">12,000 miles</td>
+                                <td data-label="Last Done"><input type="date" id="brake-last" class="date-input touch-friendly" aria-label="Last Brake Inspection Date"></td>
+                                <td data-label="Next Due"><input type="date" id="brake-next" class="date-input touch-friendly" aria-label="Next Brake Inspection Due Date"></td>
+                                <td data-label="Status" id="brake-status"><span class="status status-mobile unknown">Unknown</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 VW Beetle Maintenance Tracker | All Rights Reserved</p>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,1020 @@
+/* VW Beetle Maintenance Tracker - Styles
+   A responsive, mobile-first design for tracking maintenance and issues
+   for a 1969 VW Beetle
+*/
+
+/* ---------- Base Styles & Typography ---------- */
+:root {
+    /* Color palette inspired by vintage VW Beetle colors */
+    --primary: #4a6c6f;        /* Teal Blue (similar to Java Green) */
+    --primary-light: #6e9093;
+    --primary-dark: #2a4c4f;
+    --secondary: #d35400;      /* Burnt Orange (similar to VW Orange) */
+    --secondary-light: #e67e22;
+    --accent: #f1c40f;         /* Yellow (similar to VW Yellow) */
+    --light-bg: #f8f9fa;
+    --dark-bg: #343a40;
+    --text-dark: #212529;
+    --text-light: #f8f9fa;
+    --text-muted: #6c757d;
+    --light-border: #dee2e6;
+    
+    /* Status colors */
+    --status-unknown: #6c757d;
+    --status-due: #ffc107;
+    --status-overdue: #dc3545;
+    --status-completed: #28a745;
+    
+    /* Priority colors */
+    --priority-low: #28a745;
+    --priority-medium: #ffc107;
+    --priority-high: #fd7e14;
+    --priority-critical: #dc3545;
+    
+    /* Spacing */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2.5rem;
+    
+    /* Border radius */
+    --border-radius: 0.25rem;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: var(--text-dark);
+    background-color: var(--light-bg);
+    padding: 0;
+    margin: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    margin-bottom: var(--spacing-md);
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+h1 {
+    font-size: 1.75rem;
+}
+
+h2 {
+    font-size: 1.5rem;
+    border-bottom: 2px solid var(--primary);
+    padding-bottom: var(--spacing-xs);
+    margin-bottom: var(--spacing-lg);
+}
+
+h3 {
+    font-size: 1.25rem;
+    margin-top: var(--spacing-lg);
+}
+
+p {
+    margin-bottom: var(--spacing-md);
+}
+
+/* ---------- Layout & Container Styles ---------- */
+header {
+    background-color: var(--primary);
+    color: var(--text-light);
+    padding: var(--spacing-lg);
+    text-align: center;
+    margin-bottom: var(--spacing-lg);
+}
+
+header p {
+    margin-bottom: 0;
+    font-size: 1.1rem;
+}
+
+main {
+    max-width: 100%;
+    padding: 0 var(--spacing-md);
+    margin: 0 auto;
+}
+
+footer {
+    background-color: var(--dark-bg);
+    color: var(--text-light);
+    text-align: center;
+    padding: var(--spacing-lg);
+    margin-top: var(--spacing-xl);
+    font-size: 0.9rem;
+}
+
+.card {
+    background-color: white;
+    border-radius: var(--border-radius);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+}
+
+/* ---------- Form Styles ---------- */
+.info-container {
+    display: grid;
+    gap: var(--spacing-md);
+}
+
+.info-item {
+    margin-bottom: var(--spacing-md);
+}
+
+.form-group {
+    margin-bottom: var(--spacing-md);
+}
+
+label {
+    display: block;
+    margin-bottom: var(--spacing-xs);
+    font-weight: 600;
+}
+
+input, select, textarea {
+    width: 100%;
+    padding: var(--spacing-sm);
+    font-size: 1rem;
+    border: 1px solid var(--light-border);
+    border-radius: var(--border-radius);
+}
+
+/* Touch-friendly inputs for mobile */
+@media (max-width: 767px) {
+    input, select, textarea {
+        padding: var(--spacing-md);
+        font-size: 16px; /* Prevents zoom on focus in iOS */
+    }
+    
+    /* Add space between form elements on mobile */
+    .form-group {
+        margin-bottom: var(--spacing-lg);
+    }
+    
+    /* Make labels more visible on mobile */
+    label {
+        margin-bottom: var(--spacing-sm);
+        font-size: 1.1rem;
+    }
+}
+
+input:focus, select:focus, textarea:focus {
+    border-color: var(--primary);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(74, 108, 111, 0.25);
+}
+
+input:read-only {
+    background-color: var(--light-bg);
+    cursor: not-allowed;
+}
+
+input:invalid, select:invalid, textarea:invalid {
+    border-color: var(--status-overdue);
+}
+
+/* Touch-friendly selects */
+.touch-friendly {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%234a6c6f%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.4-12.8z%22%2F%3E%3C%2Fsvg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 12px;
+    padding-right: 30px !important;
+}
+
+/* ---------- Button Styles ---------- */
+.btn, .btn-small {
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    text-align: center;
+    transition: background-color 0.2s;
+    -webkit-tap-highlight-color: transparent; /* Remove tap highlight on mobile */
+}
+
+.btn {
+    padding: var(--spacing-sm) var(--spacing-lg);
+    width: 100%;
+}
+
+.btn-small {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: 0.9rem;
+}
+
+/* Touch-friendly buttons for mobile */
+@media (max-width: 767px) {
+    .btn {
+        padding: var(--spacing-md) var(--spacing-lg);
+        min-height: 44px; /* Minimum touch target size */
+    }
+    
+    .btn-small {
+        padding: var(--spacing-sm) var(--spacing-md);
+        min-height: 44px;
+        font-size: 1rem;
+    }
+    
+    /* Add active state for touch feedback */
+    .btn:active, .btn-small:active {
+        background-color: var(--primary-dark);
+        transform: translateY(1px);
+    }
+}
+
+.btn:hover, .btn-small:hover {
+    background-color: var(--primary-dark);
+}
+
+.btn-secondary {
+    background-color: var(--secondary);
+}
+
+.btn-secondary:hover {
+    background-color: var(--secondary-light);
+}
+
+.filter-controls {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-lg);
+    flex-wrap: wrap;
+    align-items: flex-start;
+}
+
+.filter-controls select {
+    flex: 1;
+    min-width: 150px;
+}
+
+/* Filter controls containers for better mobile layout */
+.filter-select-container {
+    flex: 1;
+    min-width: 200px;
+}
+
+.filter-buttons {
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+/* Export section responsive styles */
+.export-controls {
+    display: flex;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
+}
+
+/* ---------- Table Styles ---------- */
+.table-container {
+    overflow-x: auto;
+    margin-top: var(--spacing-lg);
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: var(--spacing-lg);
+}
+
+th, td {
+    padding: var(--spacing-sm);
+    text-align: left;
+    border-bottom: 1px solid var(--light-border);
+}
+
+th {
+    background-color: var(--primary-light);
+    color: white;
+    font-weight: 600;
+}
+
+tbody tr:nth-child(even) {
+    background-color: rgba(74, 108, 111, 0.05);
+}
+
+tbody tr:hover {
+    background-color: rgba(74, 108, 111, 0.1);
+}
+
+/* Touch-friendly date inputs */
+.date-input {
+    min-height: 44px;
+    width: 100%;
+    font-size: 16px; /* Prevents iOS zoom */
+    padding: var(--spacing-sm);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--light-border);
+    -webkit-appearance: none; /* Remove default iOS styling */
+    -moz-appearance: none;
+    appearance: none;
+    background-color: white;
+    box-sizing: border-box;
+}
+
+.date-input:focus {
+    border-color: var(--primary);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(74, 108, 111, 0.25);
+}
+
+/* Service schedule specific styles */
+.service-schedule-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 0;
+    position: relative;
+}
+
+#service-schedule .schedule-container {
+    margin-top: 0;
+    width: 100%;
+    padding: 0;
+}
+
+/* Fix proportional sizing for date inputs */
+@media screen and (max-width: 767px) {
+    #service-schedule .date-input {
+        width: 100%;
+        box-sizing: border-box;
+        max-width: none;
+    }
+}
+
+#schedule-table {
+    min-width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+    margin-bottom: 0;
+}
+
+#schedule-table th,
+#schedule-table td {
+    padding: var(--spacing-sm) var(--spacing-md);
+    vertical-align: middle;
+}
+
+#schedule-table th {
+    background-color: var(--primary-light);
+    color: white;
+    font-weight: 600;
+    text-align: left;
+}
+
+#schedule-table .status {
+    width: 100%;
+    display: inline-block;
+    text-align: center;
+    margin: 0;
+}
+
+.status-mobile {
+    padding: var(--spacing-sm);
+    border-radius: var(--border-radius);
+    font-size: 0.9rem;
+    font-weight: 600;
+    display: inline-block;
+    width: 100%;
+}
+
+/* Responsive table styles for mobile */
+@media screen and (max-width: 767px) {
+    .responsive-table thead {
+        display: none; /* Hide table headers on mobile */
+    }
+    
+    .responsive-table tbody tr {
+        display: block;
+        margin-bottom: var(--spacing-md);
+        border: 1px solid var(--light-border);
+        border-radius: var(--border-radius);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Special styling for schedule rows */
+    #schedule-table tbody tr.schedule-row {
+        border: none;
+        border-bottom: 8px solid var(--light-bg);
+        border-radius: 0;
+        box-shadow: none;
+        margin-bottom: 0;
+    }
+    
+    .responsive-table tbody tr:nth-child(even) {
+        background-color: white; /* Reset alternating colors */
+    }
+    
+    .responsive-table td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        text-align: right;
+        padding: var(--spacing-sm) var(--spacing-md);
+        border-bottom: 1px solid var(--light-border);
+    }
+    
+    .responsive-table td:last-child {
+        border-bottom: none;
+    }
+    
+    .responsive-table td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        margin-right: var(--spacing-md);
+        text-align: left;
+        flex: 1;
+    }
+    
+    .responsive-table td input,
+    .responsive-table td select {
+        max-width: 60%;
+    }
+    
+    /* Make action buttons more touch-friendly */
+    .responsive-table td:last-child {
+        display: flex;
+        justify-content: flex-end;
+    }
+    
+    .responsive-table .btn-small {
+        min-width: 80px;
+        min-height: 44px;
+        margin-left: var(--spacing-sm);
+    }
+    
+    /* Service schedule specific mobile styles */
+    #service-schedule.card {
+        padding: 0;
+        overflow: hidden;
+        margin-bottom: var(--spacing-lg);
+    }
+    
+    #service-schedule h2 {
+        padding: var(--spacing-md);
+        margin-bottom: 0;
+        border-bottom: 1px solid var(--light-border);
+    }
+    
+    .service-schedule-wrapper {
+        margin: 0;
+        padding: 0;
+        border-radius: 0;
+        overflow: visible;
+        max-width: 100vw;
+    }
+    
+    #schedule-table {
+        border: none;
+        background-color: transparent;
+        margin: 0;
+        width: 100%;
+    }
+    
+    #schedule-table tbody tr.schedule-row {
+        margin: 0;
+        border: none;
+        border-bottom: 12px solid var(--light-bg);
+        border-radius: 0;
+        box-shadow: none;
+        position: relative;
+    }
+    
+    #schedule-table tbody tr.schedule-row:last-child {
+        margin-bottom: 0;
+        border-bottom: none;
+    }
+    
+    #schedule-table td {
+        padding: var(--spacing-md);
+        border-bottom: 1px solid var(--light-border);
+        background-color: white;
+        text-align: right;
+    }
+    
+    #schedule-table td:last-child {
+        border-bottom: none;
+    }
+    
+    /* Fix label text alignment */
+    #schedule-table td::before {
+        text-align: left;
+        font-weight: 700;
+    }
+    
+    /* Date input cells */
+    #schedule-table td[data-label="Last Done"],
+    #schedule-table td[data-label="Next Due"] {
+        flex-direction: column;
+        align-items: center;
+        padding: var(--spacing-md) var(--spacing-lg);
+        overflow: hidden;
+        text-align: center;
+        margin-bottom: var(--spacing-md);
+        border-bottom: 12px solid var(--light-bg);
+    }
+    
+    #schedule-table td[data-label="Last Done"]::before,
+    #schedule-table td[data-label="Next Due"]::before {
+        margin-bottom: var(--spacing-sm);
+        width: 100%;
+        white-space: nowrap;
+        text-align: center;
+    }
+    
+    #schedule-table td[data-label="Last Done"] input,
+    #schedule-table td[data-label="Next Due"] input {
+        max-width: 35%;
+        width: 35%;
+        height: auto;
+        font-size: 1rem;
+        margin: var(--spacing-sm) auto;
+        border: none;
+        border-radius: var(--border-radius);
+        padding: var(--spacing-md);
+        box-sizing: border-box;
+        background-color: white;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        font-weight: 600;
+        text-align: center;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        display: block;
+    }
+    
+    /* Status cell */
+    #schedule-table td[data-label="Status"] {
+        flex-direction: column;
+        align-items: stretch;
+        border-bottom: none;
+        padding: var(--spacing-md) var(--spacing-md) var(--spacing-xl);
+        margin-top: var(--spacing-md);
+    }
+    
+    #schedule-table td[data-label="Status"]::before {
+        margin-bottom: var(--spacing-sm);
+        text-align: left;
+        width: 100%;
+    }
+    
+    #schedule-table .status {
+        margin: var(--spacing-sm) 0 0;
+        padding: var(--spacing-md);
+        width: 100%;
+        display: block;
+        border-radius: var(--border-radius);
+        font-size: 1rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Service and Interval cells */
+    #schedule-table td[data-label="Service"],
+    #schedule-table td[data-label="Interval"] {
+        padding: var(--spacing-md);
+    }
+    
+    #schedule-table td[data-label="Service"] {
+        border-top: 8px solid var(--light-bg);
+        font-weight: 600;
+    }
+    
+    #schedule-table tr.schedule-row:first-child td[data-label="Service"] {
+        border-top: none;
+    }
+    
+    .status-mobile {
+        width: 100%;
+        font-size: 1rem;
+        padding: var(--spacing-md);
+        margin: 0;
+        text-align: center;
+        font-weight: 600;
+    }
+}
+
+/* ---------- Issue List Styles ---------- */
+.issue-list-container {
+    margin-top: var(--spacing-lg);
+}
+
+.issue-list {
+    list-style: none;
+}
+
+.issue-item {
+    background-color: rgba(74, 108, 111, 0.05);
+    border-left: 4px solid var(--primary);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+}
+
+.issue-item.low {
+    border-left-color: var(--priority-low);
+}
+
+.issue-item.medium {
+    border-left-color: var(--priority-medium);
+}
+
+.issue-item.high {
+    border-left-color: var(--priority-high);
+}
+
+.issue-item.critical {
+    border-left-color: var(--priority-critical);
+}
+
+.issue-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-sm);
+}
+
+.issue-date {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.issue-priority {
+    font-size: 0.85rem;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--border-radius);
+    color: white;
+    font-weight: 600;
+}
+
+.issue-priority.low {
+    background-color: var(--priority-low);
+}
+
+.issue-priority.medium {
+    background-color: var(--priority-medium);
+    color: var(--text-dark);
+}
+
+.issue-priority.high {
+    background-color: var(--priority-high);
+}
+
+.issue-priority.critical {
+    background-color: var(--priority-critical);
+}
+
+.issue-description {
+    margin-bottom: var(--spacing-sm);
+}
+
+.issue-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+.issue-list.resolved .issue-item {
+    opacity: 0.7;
+    border-left-color: var(--status-completed);
+}
+
+/* ---------- Status Indicators ---------- */
+.status {
+    display: inline-block;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--border-radius);
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-align: center;
+}
+
+@media screen and (max-width: 767px) {
+    .status {
+        padding: var(--spacing-sm);
+        font-size: 0.9rem;
+    }
+    
+    /* Additional status formatting for service schedule on mobile */
+    #service-schedule .status {
+        padding: var(--spacing-md);
+        font-size: 1rem;
+        width: 100%;
+        display: block;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        border: none;
+    }
+    
+    /* Match date inputs exactly to status indicators */
+    #service-schedule .date-input {
+        padding: var(--spacing-md);
+        font-size: 1rem;
+        font-weight: 600;
+        width: 35%;
+        max-width: 35%;
+        display: block;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        border: none;
+        border-radius: var(--border-radius);
+        text-align: center;
+        background-color: white;
+        -webkit-appearance: none;
+        margin: 0 auto;
+    }
+}
+
+.status.unknown {
+    background-color: var(--status-unknown);
+    color: white;
+}
+
+.status.due {
+    background-color: var(--status-due);
+    color: var(--text-dark);
+}
+
+.status.overdue {
+    background-color: var(--status-overdue);
+    color: white;
+}
+
+.status.completed {
+    background-color: var(--status-completed);
+    color: white;
+}
+
+/* ---------- Responsive Breakpoints ---------- */
+/* Mobile First Design - Base styles are for mobile */
+
+/* Small Mobile Devices (under 576px) */
+@media screen and (max-width: 575px) {
+    /* Adjust card padding for smaller screens */
+    .card {
+        padding: var(--spacing-md);
+        margin-bottom: var(--spacing-lg);
+    }
+    
+    /* Additional service schedule improvements for very small screens */
+    #service-schedule {
+        padding: 0;
+        border-radius: var(--border-radius);
+        overflow: hidden;
+    }
+    
+    #service-schedule .schedule-container {
+        margin-top: 0;
+        padding: 0;
+    }
+    
+    /* Better touch targets and spacing for very small screens */
+    #schedule-table td {
+        padding: var(--spacing-sm) var(--spacing-md);
+    }
+    
+    #schedule-table td[data-label="Last Done"],
+    #schedule-table td[data-label="Next Due"] {
+        padding: var(--spacing-md) var(--spacing-lg);
+        margin-bottom: var(--spacing-md);
+        border-bottom: 12px solid var(--light-bg);
+    }
+    
+    #schedule-table td[data-label="Last Done"] input,
+    #schedule-table td[data-label="Next Due"] input {
+        height: auto;
+        padding: var(--spacing-md);
+        font-size: 1rem;
+        font-weight: 600;
+        margin: var(--spacing-sm) auto;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        background-color: white;
+        border: none;
+        border-radius: var(--border-radius);
+        text-align: center;
+        width: 35%;
+        max-width: 35%;
+        display: block;
+    }
+    
+    /* Status indicators on very small screens */
+    #schedule-table .status {
+        padding: var(--spacing-md);
+        font-size: 1rem;
+        margin-top: var(--spacing-sm);
+    }
+    
+    /* Ensure date inputs match status indicators exactly */
+    #schedule-table td[data-label="Last Done"],
+    #schedule-table td[data-label="Next Due"],
+    #schedule-table td[data-label="Status"] {
+        padding-bottom: var(--spacing-xl);
+        padding-top: var(--spacing-md);
+        padding-left: var(--spacing-lg);
+        padding-right: var(--spacing-lg);
+        margin-bottom: var(--spacing-md);
+    }
+    
+    /* Increase visibility of labels */
+    #schedule-table td::before {
+        font-size: 0.95rem;
+    }
+    
+    /* Better row separation */
+    #schedule-table td[data-label="Service"] {
+        border-top: 6px solid var(--light-bg);
+    }
+    
+    #schedule-table tr.schedule-row:first-child td[data-label="Service"] {
+        border-top: none;
+    }
+    
+    /* Adjust header spacing */
+    header {
+        padding: var(--spacing-md);
+        margin-bottom: var(--spacing-md);
+    }
+    
+    header h1 {
+        font-size: 1.5rem;
+    }
+    
+    header p {
+        font-size: 0.9rem;
+    }
+    
+    /* Improve form elements for touch */
+    input, select, textarea, .btn, .btn-small {
+        font-size: 16px; /* Prevents iOS zoom on focus */
+    }
+    
+    .btn, .btn-small, .touch-friendly {
+        min-height: 44px; /* Minimum touch target size */
+    }
+    
+    /* Filter controls for mobile */
+    .filter-controls {
+        flex-direction: column;
+        gap: var(--spacing-md);
+    }
+    
+    .filter-select-container {
+        width: 100%;
+    }
+    
+    .filter-buttons {
+        display: flex;
+        width: 100%;
+        gap: var(--spacing-md);
+    }
+    
+    .filter-buttons .btn-small {
+        flex: 1;
+    }
+    
+    /* Export controls for mobile */
+    .export-controls {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+    }
+    
+    .export-controls .btn-small {
+        width: 100%;
+    }
+}
+
+/* Tablet (768px and up) */
+@media screen and (min-width: 768px) {
+    h1 {
+        font-size: 2.25rem;
+    }
+    
+    h2 {
+        font-size: 1.75rem;
+    }
+    
+    main {
+        max-width: 90%;
+        margin: 0 auto;
+    }
+    
+    .info-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .btn {
+        width: auto;
+    }
+    
+    #maintenance-form {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--spacing-md);
+    }
+    
+    #maintenance-form .form-group:nth-child(5),
+    #maintenance-form button {
+        grid-column: span 2;
+    }
+    
+    #issue-form {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--spacing-md);
+    }
+    
+    #issue-form .form-group:nth-child(2),
+    #issue-form button {
+        grid-column: span 2;
+    }
+}
+
+/* Desktop (992px and up) */
+@media screen and (min-width: 992px) {
+    main {
+        max-width: 80%;
+    }
+    
+    .info-container {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .info-container button {
+        grid-column: span 3;
+        width: 50%;
+        justify-self: center;
+    }
+    
+    .issue-list-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--spacing-lg);
+    }
+}
+
+/* Large Desktop (1200px and up) */
+@media screen and (min-width: 1200px) {
+    main {
+        max-width: 1140px;
+    }
+}
+
+/* ---------- Print Styles ---------- */
+@media print {
+    body {
+        background-color: white;
+        color: black;
+        font-size: 12pt;
+    }
+    
+    header, footer, button, .btn, .btn-small {
+        display: none;
+    }
+    
+    .card {
+        box-shadow: none;
+        border: 1px solid #ddd;
+        break-inside: avoid;
+    }
+    
+    h1, h2, h3 {
+        color: black;
+    }
+    
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+    
+    table, th, td {
+        border: 1px solid #ddd;
+    }
+    
+    .status, .issue-priority {
+        border: 1px solid #ddd;
+        padding: 2px 5px;
+        background: none !important;
+        color: black !important;
+    }
+    
+    a {
+        color: black;
+        text-decoration: none;
+    }
+    
+    /* Ensure page breaks don't happen in the middle of sections */
+    main section {
+        page-break-after: always;
+    }
+}
+
