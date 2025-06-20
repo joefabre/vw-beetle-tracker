@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VW Beetle Tracker - Auto Status Check</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #f0f8ff;
+        }
+        .status-container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            border: 3px solid #4a6c6f;
+        }
+        .status-item {
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .status-working { background-color: #d4edda; color: #155724; border: 2px solid #28a745; }
+        .status-error { background-color: #f8d7da; color: #721c24; border: 2px solid #dc3545; }
+        .status-testing { background-color: #fff3cd; color: #856404; border: 2px solid #ffc107; }
+        .status-info { background-color: #d1ecf1; color: #0c5460; border: 2px solid #17a2b8; }
+        .big-status {
+            font-size: 24px;
+            text-align: center;
+            padding: 30px;
+            margin: 20px 0;
+            border-radius: 15px;
+            font-weight: bold;
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .test-details {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            margin: 10px 0;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .action-buttons {
+            text-align: center;
+            margin: 30px 0;
+        }
+        .btn {
+            background-color: #4a6c6f;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .btn:hover { background-color: #2a4c4f; }
+        .btn-success { background-color: #28a745; }
+        .btn-danger { background-color: #dc3545; }
+        .timestamp {
+            text-align: center;
+            color: #6c757d;
+            font-size: 14px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="status-container">
+        <h1 style="text-align: center; color: #4a6c6f;">🚗 VW Beetle Tracker - Database Status</h1>
+        
+        <div id="overall-status" class="big-status status-testing">
+            <div class="loading"></div> Running automatic tests...
+        </div>
+        
+        <div id="test-results"></div>
+        
+        <div class="action-buttons">
+            <button class="btn" onclick="runTests()">🔄 Re-run Tests</button>
+            <button class="btn btn-success" onclick="goToApp()">🚗 Open VW Tracker</button>
+            <button class="btn" onclick="openDiagnostic()">🔧 Open Diagnostic Tool</button>
+        </div>
+        
+        <div class="timestamp" id="last-update"></div>
+        
+        <div class="test-details" id="detailed-log"></div>
+    </div>
+
+    <!-- Firebase CDN Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    
+    <script>
+        let testLog = [];
+        
+        function addToLog(message, type = 'info') {
+            testLog.push(`[${new Date().toLocaleTimeString()}] ${message}`);
+            updateDetailedLog();
+        }
+        
+        function updateDetailedLog() {
+            document.getElementById('detailed-log').textContent = testLog.join('\n');
+        }
+        
+        function updateOverallStatus(message, type) {
+            const statusDiv = document.getElementById('overall-status');
+            statusDiv.className = `big-status status-${type}`;
+            statusDiv.innerHTML = message;
+        }
+        
+        function addStatusItem(message, type, icon = '') {
+            const resultsDiv = document.getElementById('test-results');
+            const item = document.createElement('div');
+            item.className = `status-item status-${type}`;
+            item.innerHTML = `<span>${icon} ${message}</span>`;
+            resultsDiv.appendChild(item);
+        }
+        
+        function updateTimestamp() {
+            document.getElementById('last-update').textContent = 
+                `Last updated: ${new Date().toLocaleString()}`;
+        }
+        
+        async function runTests() {
+            // Clear previous results
+            document.getElementById('test-results').innerHTML = '';
+            testLog = [];
+            updateOverallStatus('<div class="loading"></div> Running tests...', 'testing');
+            
+            addToLog('Starting automatic database tests');
+            
+            try {
+                // Test 1: Check protocol
+                if (window.location.protocol === 'file:') {
+                    addStatusItem('Running from file:// - This causes offline errors!', 'error', '⚠️');
+                    addToLog('ERROR: Running from file:// protocol');
+                    updateOverallStatus('❌ PROBLEM: Running from file:// protocol', 'error');
+                    addStatusItem('SOLUTION: Use http://localhost:8080 instead', 'info', '💡');
+                    return;
+                } else {
+                    addStatusItem('Running from HTTP server ✓', 'working', '✅');
+                    addToLog('SUCCESS: Running from HTTP server');
+                }
+                
+                // Test 2: Firebase availability
+                if (typeof firebase === 'undefined') {
+                    addStatusItem('Firebase library not loaded', 'error', '❌');
+                    addToLog('ERROR: Firebase library not loaded');
+                    updateOverallStatus('❌ PROBLEM: Firebase not loaded', 'error');
+                    return;
+                } else {
+                    addStatusItem('Firebase library loaded ✓', 'working', '✅');
+                    addToLog('SUCCESS: Firebase library loaded');
+                }
+                
+                // Test 3: Initialize Firebase
+                const firebaseConfig = {
+                    apiKey: "AIzaSyDGcwqNB9njH0ZumQXKJhvFzl-VLY1u6PQ",
+                    authDomain: "vw-beetle-tracker.firebaseapp.com",
+                    projectId: "vw-beetle-tracker",
+                    storageBucket: "vw-beetle-tracker.firebasestorage.app",
+                    messagingSenderId: "720165426241",
+                    appId: "1:720165426241:web:4a416dd4136c09f17aa2c0",
+                    measurementId: "G-Z6LEP6KY00"
+                };
+                
+                if (!firebase.apps.length) {
+                    firebase.initializeApp(firebaseConfig);
+                }
+                
+                const db = firebase.firestore();
+                addStatusItem('Firebase initialized ✓', 'working', '✅');
+                addToLog('SUCCESS: Firebase initialized');
+                
+                // Test 4: Connection test with timeout
+                addStatusItem('Testing database connection...', 'testing', '🔄');
+                addToLog('Testing database connection...');
+                
+                const timeoutPromise = new Promise((_, reject) => {
+                    setTimeout(() => reject(new Error('Connection timeout')), 8000);
+                });
+                
+                const testDoc = db.collection('vehicles').doc('status-test');
+                
+                try {
+                    await Promise.race([
+                        testDoc.set({ 
+                            test: true, 
+                            timestamp: new Date().toISOString(),
+                            source: 'auto-status-check'
+                        }),
+                        timeoutPromise
+                    ]);
+                    
+                    addStatusItem('Database write successful ✓', 'working', '✅');
+                    addToLog('SUCCESS: Database write test passed');
+                    
+                    // Test read
+                    const doc = await testDoc.get();
+                    if (doc.exists) {
+                        addStatusItem('Database read successful ✓', 'working', '✅');
+                        addToLog('SUCCESS: Database read test passed');
+                        
+                        updateOverallStatus('🎉 ALL TESTS PASSED! Database is working perfectly', 'working');
+                        addStatusItem('Your VW Beetle Tracker database is fully functional!', 'working', '🚗');
+                    } else {
+                        addStatusItem('Read test failed - document not found', 'error', '❌');
+                        addToLog('ERROR: Read test failed');
+                    }
+                    
+                } catch (dbError) {
+                    addStatusItem(`Database connection failed: ${dbError.message}`, 'error', '❌');
+                    addToLog(`ERROR: Database connection failed - ${dbError.message}`);
+                    
+                    if (dbError.message.includes('offline')) {
+                        updateOverallStatus('❌ PROBLEM: Firebase client is offline', 'error');
+                        addStatusItem('Try: Clear browser cache and reload', 'info', '💡');
+                        addStatusItem('Try: Use incognito/private browsing mode', 'info', '💡');
+                        addStatusItem('Try: Check firewall/proxy settings', 'info', '💡');
+                    } else {
+                        updateOverallStatus(`❌ PROBLEM: ${dbError.message}`, 'error');
+                    }
+                }
+                
+            } catch (error) {
+                addStatusItem(`Test failed: ${error.message}`, 'error', '❌');
+                addToLog(`ERROR: Test failed - ${error.message}`);
+                updateOverallStatus('❌ PROBLEM: Test execution failed', 'error');
+            }
+            
+            updateTimestamp();
+        }
+        
+        function goToApp() {
+            if (window.location.protocol === 'file:') {
+                window.open('http://localhost:8080/index.html', '_blank');
+            } else {
+                window.open('index.html', '_blank');
+            }
+        }
+        
+        function openDiagnostic() {
+            if (window.location.protocol === 'file:') {
+                window.open('http://localhost:8080/firebase-diagnostic.html', '_blank');
+            } else {
+                window.open('firebase-diagnostic.html', '_blank');
+            }
+        }
+        
+        // Auto-run tests when page loads
+        window.addEventListener('load', () => {
+            setTimeout(runTests, 1000);
+        });
+        
+        // Auto-refresh every 30 seconds
+        setInterval(() => {
+            runTests();
+        }, 30000);
+        
+        // Update timestamp every second
+        setInterval(updateTimestamp, 1000);
+    </script>
+</body>
+</html>
+

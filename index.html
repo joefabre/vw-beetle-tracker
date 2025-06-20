@@ -225,12 +225,92 @@
                 </div>
             </div>
         </section>
+
+        <section id="data-management" class="card">
+            <h2>Data Management & Backup</h2>
+            
+            <div class="data-section">
+                <h3>Export Data (Backup)</h3>
+                <p>Download your data for backup and retention purposes.</p>
+                <div class="export-controls">
+                    <button id="export-all-csv" class="btn touch-friendly">
+                        <i class="fas fa-download"></i> Export All Data to CSV
+                    </button>
+                    <button id="export-maintenance-csv" class="btn-small touch-friendly">
+                        <i class="fas fa-wrench"></i> Export Maintenance Only
+                    </button>
+                    <button id="export-complete-backup" class="btn-small touch-friendly">
+                        <i class="fas fa-archive"></i> Export Complete Backup (JSON)
+                    </button>
+                </div>
+            </div>
+            
+            <div class="data-section">
+                <h3>Import Data (Restore)</h3>
+                <p>Restore data from previously exported files.</p>
+                
+                <div class="import-section">
+                    <div class="form-group">
+                        <label for="csv-import-file">Import CSV File:</label>
+                        <input type="file" id="csv-import-file" accept=".csv" class="file-input">
+                        <button id="import-csv-btn" class="btn-small" disabled>
+                            <i class="fas fa-upload"></i> Import CSV Data
+                        </button>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="json-import-file">Import Complete Backup (JSON):</label>
+                        <input type="file" id="json-import-file" accept=".json" class="file-input">
+                        <button id="import-json-btn" class="btn-small" disabled>
+                            <i class="fas fa-upload"></i> Import JSON Backup
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="import-options">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="merge-data" checked>
+                        Merge with existing data (uncheck to replace all data)
+                    </label>
+                </div>
+            </div>
+            
+            <div class="data-section">
+                <h3>Data Statistics</h3>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <span class="stat-number" id="maintenance-count">0</span>
+                        <span class="stat-label">Maintenance Records</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="issues-count">0</span>
+                        <span class="stat-label">Total Issues</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="active-issues-count">0</span>
+                        <span class="stat-label">Active Issues</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="last-backup">Never</span>
+                        <span class="stat-label">Last Backup</span>
+                    </div>
+                </div>
+            </div>
+        </section>
     </main>
 
     <footer>
         <p>&copy; 2025 VW Beetle Maintenance Tracker | All Rights Reserved</p>
     </footer>
 
+    <!-- Firebase CDN Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    
+    <!-- Firebase Configuration -->
+    <script src="js/firebase-config.js"></script>
+    
+    <!-- Main Application Script -->
     <script src="js/main.js"></script>
 </body>
 </html>

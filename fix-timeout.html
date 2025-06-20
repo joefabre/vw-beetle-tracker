@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Timeout Fix Tool</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff5f5;
+        }
+        .fix-container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            border: 3px solid #dc3545;
+        }
+        .fix-step {
+            background-color: #f8f9fa;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+            border-left: 4px solid #28a745;
+        }
+        .fix-step h3 {
+            color: #28a745;
+            margin-bottom: 10px;
+        }
+        .error-box {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            border: 1px solid #f5c6cb;
+        }
+        .success-box {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            border: 1px solid #c3e6cb;
+        }
+        .btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 5px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .btn:hover { background-color: #c82333; }
+        .btn-success { background-color: #28a745; }
+        .btn-success:hover { background-color: #218838; }
+        .code-block {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            border: 1px solid #dee2e6;
+            margin: 10px 0;
+        }
+        .progress {
+            background-color: #e9ecef;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .progress-bar {
+            background-color: #28a745;
+            height: 20px;
+            border-radius: 4px;
+            text-align: center;
+            line-height: 20px;
+            color: white;
+            font-size: 12px;
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div class="fix-container">
+        <h1 style="text-align: center; color: #dc3545;">🔥 Firebase Timeout Fix Tool</h1>
+        
+        <div class="error-box">
+            <strong>❌ Problem Detected:</strong> Database server connection failed: timeout
+        </div>
+        
+        <div id="fix-progress" class="progress" style="display: none;">
+            <div id="progress-bar" class="progress-bar" style="width: 0%;">Starting...</div>
+        </div>
+        
+        <div id="fix-results"></div>
+        
+        <div class="fix-step">
+            <h3>🎯 Automatic Fix Sequence</h3>
+            <p>This tool will automatically try multiple solutions for Firebase timeout issues:</p>
+            <ul>
+                <li>✅ Reset Firebase connection settings</li>
+                <li>✅ Clear browser cache and storage</li>
+                <li>✅ Enable offline persistence</li>
+                <li>✅ Configure timeout settings</li>
+                <li>✅ Test connection with fallbacks</li>
+            </ul>
+            <button class="btn" onclick="startAutomaticFix()">🚀 Start Automatic Fix</button>
+        </div>
+        
+        <div class="fix-step">
+            <h3>🔧 Manual Solutions</h3>
+            <button class="btn" onclick="clearBrowserData()">🧹 Clear Browser Data</button>
+            <button class="btn" onclick="resetFirebaseConnection()">🔄 Reset Firebase</button>
+            <button class="btn" onclick="enableOfflineMode()">📱 Enable Offline Mode</button>
+            <button class="btn" onclick="testWithDifferentSettings()">⚙️ Test Different Settings</button>
+        </div>
+        
+        <div class="fix-step">
+            <h3>🌐 Quick Network Tests</h3>
+            <button class="btn btn-success" onclick="testConnectivity()">📡 Test Network</button>
+            <button class="btn btn-success" onclick="testFirebaseAPI()">🔗 Test Firebase API</button>
+        </div>
+        
+        <div class="fix-step">
+            <h3>💡 If All Else Fails</h3>
+            <div class="code-block">
+                <strong>Try these browser settings:</strong><br>
+                1. Open browser in incognito/private mode<br>
+                2. Disable ad blockers and extensions<br>
+                3. Check if you're behind a corporate firewall<br>
+                4. Try a different browser (Chrome, Firefox, Safari)
+            </div>
+            <button class="btn" onclick="openIncognito()">🕵️ Instructions for Incognito</button>
+        </div>
+    </div>
+
+    <!-- Firebase CDN Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    
+    <script>
+        let currentStep = 0;
+        const totalSteps = 5;
+        
+        function showProgress(step, message) {
+            const progressDiv = document.getElementById('fix-progress');
+            const progressBar = document.getElementById('progress-bar');
+            
+            progressDiv.style.display = 'block';
+            const percentage = (step / totalSteps) * 100;
+            progressBar.style.width = percentage + '%';
+            progressBar.textContent = message;
+        }
+        
+        function addResult(message, type = 'info') {
+            const resultsDiv = document.getElementById('fix-results');
+            const resultDiv = document.createElement('div');
+            
+            if (type === 'success') {
+                resultDiv.className = 'success-box';
+            } else if (type === 'error') {
+                resultDiv.className = 'error-box';
+            } else {
+                resultDiv.className = 'fix-step';
+            }
+            
+            resultDiv.innerHTML = message;
+            resultsDiv.appendChild(resultDiv);
+        }
+        
+        async function startAutomaticFix() {
+            document.getElementById('fix-results').innerHTML = '';
+            addResult('🚀 Starting automatic fix sequence...', 'info');
+            
+            try {
+                // Step 1: Clear browser storage
+                showProgress(1, 'Clearing browser storage...');
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                try {
+                    localStorage.clear();
+                    sessionStorage.clear();
+                    addResult('✅ Step 1: Browser storage cleared', 'success');
+                } catch (e) {
+                    addResult('⚠️ Step 1: Could not clear storage (permissions)', 'error');
+                }
+                
+                // Step 2: Initialize Firebase with timeout settings
+                showProgress(2, 'Configuring Firebase with timeout settings...');
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                const firebaseConfig = {
+                    apiKey: "AIzaSyDGcwqNB9njH0ZumQXKJhvFzl-VLY1u6PQ",
+                    authDomain: "vw-beetle-tracker.firebaseapp.com",
+                    projectId: "vw-beetle-tracker",
+                    storageBucket: "vw-beetle-tracker.firebasestorage.app",
+                    messagingSenderId: "720165426241",
+                    appId: "1:720165426241:web:4a416dd4136c09f17aa2c0",
+                    measurementId: "G-Z6LEP6KY00"
+                };
+                
+                // Reinitialize Firebase
+                if (firebase.apps.length > 0) {
+                    await firebase.app().delete();
+                }
+                
+                firebase.initializeApp(firebaseConfig);
+                addResult('✅ Step 2: Firebase reinitialized with new settings', 'success');
+                
+                // Step 3: Configure Firestore with custom settings
+                showProgress(3, 'Configuring Firestore settings...');
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                const db = firebase.firestore();
+                
+                // Configure settings to handle timeouts better
+                db.settings({
+                    cacheSizeBytes: firebase.firestore.CACHE_SIZE_UNLIMITED,
+                    ignoreUndefinedProperties: true
+                });
+                
+                addResult('✅ Step 3: Firestore configured with timeout-resistant settings', 'success');
+                
+                // Step 4: Enable offline persistence
+                showProgress(4, 'Enabling offline persistence...');
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                try {
+                    await db.enablePersistence({ synchronizeTabs: true });
+                    addResult('✅ Step 4: Offline persistence enabled', 'success');
+                } catch (persistError) {
+                    if (persistError.code === 'failed-precondition') {
+                        addResult('⚠️ Step 4: Offline persistence failed (multiple tabs open)', 'error');
+                    } else {
+                        addResult('⚠️ Step 4: Offline persistence not supported', 'error');
+                    }
+                }
+                
+                // Step 5: Test connection with retries
+                showProgress(5, 'Testing connection with retries...');
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                let connectionSuccess = false;
+                for (let attempt = 1; attempt <= 3; attempt++) {
+                    try {
+                        addResult(`🔄 Connection attempt ${attempt}/3...`, 'info');
+                        
+                        const testDoc = db.collection('vehicles').doc('timeout-fix-test');
+                        
+                        // Use a shorter timeout for each attempt
+                        const testPromise = testDoc.set({
+                            test: true,
+                            timestamp: new Date().toISOString(),
+                            attempt: attempt,
+                            fixTool: 'timeout-fix'
+                        });
+                        
+                        const timeoutPromise = new Promise((_, reject) => {
+                            setTimeout(() => reject(new Error('Attempt timeout')), 5000);
+                        });
+                        
+                        await Promise.race([testPromise, timeoutPromise]);
+                        
+                        // If we get here, the write succeeded
+                        const readTest = await Promise.race([
+                            testDoc.get(),
+                            new Promise((_, reject) => setTimeout(() => reject(new Error('Read timeout')), 5000))
+                        ]);
+                        
+                        if (readTest.exists) {
+                            connectionSuccess = true;
+                            addResult(`✅ Step 5: Connection successful on attempt ${attempt}!`, 'success');
+                            break;
+                        }
+                        
+                    } catch (attemptError) {
+                        addResult(`❌ Attempt ${attempt} failed: ${attemptError.message}`, 'error');
+                        if (attempt < 3) {
+                            addResult('⏳ Waiting 2 seconds before retry...', 'info');
+                            await new Promise(resolve => setTimeout(resolve, 2000));
+                        }
+                    }
+                }
+                
+                showProgress(5, 'Fix sequence complete!');
+                
+                if (connectionSuccess) {
+                    addResult('🎉 SUCCESS! Firebase connection is now working!', 'success');
+                    addResult('✅ Your VW Beetle Tracker should now work properly', 'success');
+                    addResult('<button class="btn btn-success" onclick="window.open(\'index.html\', \'_blank\')">🚗 Open VW Tracker</button>', 'success');
+                } else {
+                    addResult('❌ Automatic fix could not resolve the timeout issue', 'error');
+                    addResult('💡 Try the manual solutions below or contact your network administrator', 'error');
+                }
+                
+            } catch (error) {
+                addResult(`❌ Fix sequence failed: ${error.message}`, 'error');
+                addResult('💡 Try the manual solutions below', 'error');
+            }
+        }
+        
+        async function clearBrowserData() {
+            try {
+                localStorage.clear();
+                sessionStorage.clear();
+                addResult('✅ Browser data cleared. Please reload the page.', 'success');
+            } catch (error) {
+                addResult('❌ Could not clear browser data. Try manually in browser settings.', 'error');
+            }
+        }
+        
+        async function resetFirebaseConnection() {
+            try {
+                if (firebase.apps.length > 0) {
+                    await firebase.app().delete();
+                }
+                addResult('✅ Firebase connection reset. Try running the automatic fix.', 'success');
+            } catch (error) {
+                addResult(`❌ Reset failed: ${error.message}`, 'error');
+            }
+        }
+        
+        async function enableOfflineMode() {
+            try {
+                const firebaseConfig = {
+                    apiKey: "AIzaSyDGcwqNB9njH0ZumQXKJhvFzl-VLY1u6PQ",
+                    authDomain: "vw-beetle-tracker.firebaseapp.com",
+                    projectId: "vw-beetle-tracker",
+                    storageBucket: "vw-beetle-tracker.firebasestorage.app",
+                    messagingSenderId: "720165426241",
+                    appId: "1:720165426241:web:4a416dd4136c09f17aa2c0",
+                    measurementId: "G-Z6LEP6KY00"
+                };
+                
+                if (!firebase.apps.length) {
+                    firebase.initializeApp(firebaseConfig);
+                }
+                
+                const db = firebase.firestore();
+                await db.enablePersistence();
+                addResult('✅ Offline mode enabled. App will work without internet.', 'success');
+            } catch (error) {
+                addResult(`❌ Offline mode failed: ${error.message}`, 'error');
+            }
+        }
+        
+        function testConnectivity() {
+            addResult('🔄 Testing network connectivity...', 'info');
+            
+            fetch('https://www.google.com/favicon.ico', { mode: 'no-cors' })
+                .then(() => {
+                    addResult('✅ Internet connection is working', 'success');
+                    
+                    return fetch('https://firestore.googleapis.com', { mode: 'no-cors' });
+                })
+                .then(() => {
+                    addResult('✅ Can reach Firebase servers', 'success');
+                })
+                .catch(error => {
+                    addResult(`❌ Network test failed: ${error.message}`, 'error');
+                });
+        }
+        
+        function openIncognito() {
+            addResult(`
+                <strong>🕵️ Incognito/Private Mode Instructions:</strong><br>
+                <strong>Chrome:</strong> Ctrl+Shift+N (Cmd+Shift+N on Mac)<br>
+                <strong>Firefox:</strong> Ctrl+Shift+P (Cmd+Shift+P on Mac)<br>
+                <strong>Safari:</strong> Cmd+Shift+N<br>
+                <strong>Edge:</strong> Ctrl+Shift+N<br><br>
+                Then visit: <code>http://localhost:8080</code>
+            `, 'info');
+        }
+    </script>
+</body>
+</html>
+

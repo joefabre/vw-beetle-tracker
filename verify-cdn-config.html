@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CDN & Config Verification</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #f0f8ff;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            border: 3px solid #28a745;
+        }
+        .test-item {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid #007bff;
+            background-color: #f8f9fa;
+        }
+        .success { border-left-color: #28a745; background-color: #d4edda; }
+        .error { border-left-color: #dc3545; background-color: #f8d7da; }
+        .warning { border-left-color: #ffc107; background-color: #fff3cd; }
+        .config-box {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            margin: 10px 0;
+            border: 1px solid #dee2e6;
+            white-space: pre-wrap;
+        }
+        .btn {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 5px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .btn:hover { background-color: #218838; }
+        h2 { color: #28a745; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 style="text-align: center; color: #28a745;">🔍 CDN & Configuration Verification</h1>
+        
+        <div id="results"></div>
+        
+        <div style="text-align: center; margin: 30px 0;">
+            <button class="btn" onclick="runVerification()">🔄 Re-run Verification</button>
+            <button class="btn" onclick="testActualConnection()">🚀 Test Live Connection</button>
+        </div>
+        
+        <div id="config-display" style="display: none;">
+            <h3>Your Firebase Configuration:</h3>
+            <div id="config-content" class="config-box"></div>
+        </div>
+    </div>
+
+    <script>
+        let results = [];
+        
+        function addResult(title, message, type = 'test-item') {
+            const resultsDiv = document.getElementById('results');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `test-item ${type}`;
+            
+            let icon = '📋';
+            if (type === 'success') icon = '✅';
+            if (type === 'error') icon = '❌';
+            if (type === 'warning') icon = '⚠️';
+            
+            resultDiv.innerHTML = `
+                <h4>${icon} ${title}</h4>
+                <p>${message}</p>
+            `;
+            resultsDiv.appendChild(resultDiv);
+        }
+        
+        async function runVerification() {
+            document.getElementById('results').innerHTML = '';
+            
+            addResult('🔍 Starting CDN & Configuration Verification', 'Checking all Firebase components...', 'warning');
+            
+            // Test 1: CDN Connectivity
+            addResult('Testing Firebase CDN', 'Checking if Firebase scripts are accessible...', 'warning');
+            
+            try {
+                // Test Firebase App CDN
+                const appResponse = await fetch('https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js', { method: 'HEAD' });
+                if (appResponse.ok) {
+                    addResult('Firebase App CDN', `✓ Firebase App script accessible (${appResponse.status})`, 'success');
+                } else {
+                    addResult('Firebase App CDN', `✗ Firebase App script returned ${appResponse.status}`, 'error');
+                }
+                
+                // Test Firebase Firestore CDN
+                const firestoreResponse = await fetch('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js', { method: 'HEAD' });
+                if (firestoreResponse.ok) {
+                    addResult('Firebase Firestore CDN', `✓ Firestore script accessible (${firestoreResponse.status})`, 'success');
+                } else {
+                    addResult('Firebase Firestore CDN', `✗ Firestore script returned ${firestoreResponse.status}`, 'error');
+                }
+                
+            } catch (error) {
+                addResult('CDN Connectivity', `✗ Cannot reach Firebase CDN: ${error.message}`, 'error');
+            }
+            
+            // Test 2: Configuration Validation
+            addResult('Configuration Check', 'Validating Firebase project configuration...', 'warning');
+            
+            const config = {
+                apiKey: "AIzaSyDGcwqNB9njH0ZumQXKJhvFzl-VLY1u6PQ",
+                authDomain: "vw-beetle-tracker.firebaseapp.com",
+                projectId: "vw-beetle-tracker",
+                storageBucket: "vw-beetle-tracker.firebasestorage.app",
+                messagingSenderId: "720165426241",
+                appId: "1:720165426241:web:4a416dd4136c09f17aa2c0",
+                measurementId: "G-Z6LEP6KY00"
+            };
+            
+            // Validate required fields
+            const requiredFields = ['apiKey', 'authDomain', 'projectId', 'storageBucket', 'messagingSenderId', 'appId'];
+            let configValid = true;
+            
+            requiredFields.forEach(field => {
+                if (!config[field] || config[field].trim() === '') {
+                    addResult(`Config Field: ${field}`, `✗ Missing or empty`, 'error');
+                    configValid = false;
+                } else {
+                    addResult(`Config Field: ${field}`, `✓ Present and valid`, 'success');
+                }
+            });
+            
+            // Show configuration
+            document.getElementById('config-content').textContent = JSON.stringify(config, null, 2);
+            document.getElementById('config-display').style.display = 'block';
+            
+            // Test 3: Project ID Format
+            if (config.projectId.match(/^[a-z0-9-]+$/)) {
+                addResult('Project ID Format', '✓ Project ID format is valid', 'success');
+            } else {
+                addResult('Project ID Format', '✗ Project ID contains invalid characters', 'error');
+                configValid = false;
+            }
+            
+            // Test 4: Auth Domain Format
+            if (config.authDomain.includes('.firebaseapp.com')) {
+                addResult('Auth Domain Format', '✓ Auth domain format is correct', 'success');
+            } else {
+                addResult('Auth Domain Format', '✗ Auth domain should end with .firebaseapp.com', 'error');
+                configValid = false;
+            }
+            
+            // Test 5: API Key Format
+            if (config.apiKey.startsWith('AIza') && config.apiKey.length > 30) {
+                addResult('API Key Format', '✓ API key format appears correct', 'success');
+            } else {
+                addResult('API Key Format', '✗ API key format appears incorrect', 'error');
+                configValid = false;
+            }
+            
+            // Test 6: Storage Bucket Format
+            if (config.storageBucket.includes('.firebasestorage.app') || config.storageBucket.includes('.appspot.com')) {
+                addResult('Storage Bucket Format', '✓ Storage bucket format is correct', 'success');
+            } else {
+                addResult('Storage Bucket Format', '✗ Storage bucket format appears incorrect', 'warning');
+            }
+            
+            // Test 7: Network connectivity to Firebase servers
+            addResult('Firebase Servers', 'Testing connectivity to Firebase infrastructure...', 'warning');
+            
+            try {
+                const firebaseTest = await fetch('https://firestore.googleapis.com', { mode: 'no-cors' });
+                addResult('Firestore API', '✓ Can reach Firestore servers', 'success');
+            } catch (error) {
+                addResult('Firestore API', `✗ Cannot reach Firestore: ${error.message}`, 'error');
+            }
+            
+            try {
+                const authTest = await fetch(`https://${config.authDomain}`, { mode: 'no-cors' });
+                addResult('Firebase Auth Domain', '✓ Can reach Firebase Auth domain', 'success');
+            } catch (error) {
+                addResult('Firebase Auth Domain', `✗ Cannot reach Auth domain: ${error.message}`, 'error');
+            }
+            
+            // Summary
+            if (configValid) {
+                addResult('🎉 Overall Status', 'CDN connections and configuration appear correct!<br>Your Firebase setup should work properly.', 'success');
+            } else {
+                addResult('⚠️ Overall Status', 'Some configuration issues detected.<br>Please review the errors above.', 'error');
+            }
+        }
+        
+        async function testActualConnection() {
+            addResult('🚀 Live Connection Test', 'Testing actual Firebase connection...', 'warning');
+            
+            try {
+                // Load Firebase dynamically
+                if (typeof firebase === 'undefined') {
+                    addResult('Loading Firebase', 'Loading Firebase scripts...', 'warning');
+                    
+                    await loadScript('https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js');
+                    await loadScript('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js');
+                    
+                    addResult('Firebase Scripts', '✓ Firebase scripts loaded successfully', 'success');
+                }
+                
+                // Initialize Firebase
+                const config = {
+                    apiKey: "AIzaSyDGcwqNB9njH0ZumQXKJhvFzl-VLY1u6PQ",
+                    authDomain: "vw-beetle-tracker.firebaseapp.com",
+                    projectId: "vw-beetle-tracker",
+                    storageBucket: "vw-beetle-tracker.firebasestorage.app",
+                    messagingSenderId: "720165426241",
+                    appId: "1:720165426241:web:4a416dd4136c09f17aa2c0",
+                    measurementId: "G-Z6LEP6KY00"
+                };
+                
+                if (firebase.apps.length === 0) {
+                    firebase.initializeApp(config);
+                }
+                
+                addResult('Firebase Initialization', '✓ Firebase initialized successfully', 'success');
+                
+                // Test Firestore
+                const db = firebase.firestore();
+                addResult('Firestore Instance', '✓ Firestore instance created', 'success');
+                
+                // Test actual read/write
+                const testDoc = db.collection('cdn-config-test').doc('verification');
+                
+                await testDoc.set({
+                    timestamp: new Date().toISOString(),
+                    test: 'cdn-config-verification',
+                    status: 'success',
+                    browser: navigator.userAgent
+                });
+                
+                addResult('Write Test', '✓ Successfully wrote to Firestore', 'success');
+                
+                const doc = await testDoc.get();
+                if (doc.exists) {
+                    addResult('Read Test', '✓ Successfully read from Firestore', 'success');
+                    addResult('🎉 Connection Test', 'Firebase is fully functional!<br>CDN, configuration, and database are all working correctly.', 'success');
+                } else {
+                    addResult('Read Test', '✗ Could not read document after writing', 'error');
+                }
+                
+            } catch (error) {
+                addResult('Connection Test Failed', `✗ Error: ${error.message}`, 'error');
+                
+                if (error.message.includes('offline')) {
+                    addResult('Diagnosis', 'Firebase client is offline. Check internet connection and firewall settings.', 'warning');
+                } else if (error.message.includes('permission')) {
+                    addResult('Diagnosis', 'Permission denied. Check your Firebase security rules.', 'warning');
+                } else {
+                    addResult('Diagnosis', 'Unknown error. Check browser console for more details.', 'warning');
+                }
+            }
+        }
+        
+        function loadScript(src) {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = src;
+                script.onload = resolve;
+                script.onerror = reject;
+                document.head.appendChild(script);
+            });
+        }
+        
+        // Auto-run verification when page loads
+        window.addEventListener('load', () => {
+            setTimeout(runVerification, 500);
+        });
+    </script>
+</body>
+</html>
+

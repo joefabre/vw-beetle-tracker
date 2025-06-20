@@ -1,0 +1,31 @@
+::1 - - [06/Jun/2025 18:01:40] "GET / HTTP/1.1" 200 -
+::1 - - [06/Jun/2025 18:01:47] "GET / HTTP/1.1" 200 -
+::1 - - [06/Jun/2025 18:01:47] "GET /css/styles.css HTTP/1.1" 200 -
+::1 - - [06/Jun/2025 18:01:47] "GET /js/firebase-config.js HTTP/1.1" 200 -
+::1 - - [06/Jun/2025 18:01:47] "GET /js/main.js HTTP/1.1" 200 -
+::1 - - [06/Jun/2025 18:01:47] code 404, message File not found
+::1 - - [06/Jun/2025 18:01:47] "GET /favicon.ico HTTP/1.1" 404 -
+::1 - - [06/Jun/2025 18:06:04] "GET /status.html HTTP/1.1" 200 -
+::1 - - [06/Jun/2025 18:06:49] "GET /firebase-diagnostic.html HTTP/1.1" 200 -
+::1 - - [06/Jun/2025 18:07:27] "GET /status.html HTTP/1.1" 200 -
+::1 - - [06/Jun/2025 18:09:56] "GET /fix-timeout.html HTTP/1.1" 200 -
+::1 - - [06/Jun/2025 18:11:46] code 404, message File not found
+::1 - - [06/Jun/2025 18:11:46] "GET /apple-touch-icon-precomposed.png HTTP/1.1" 404 -
+::1 - - [06/Jun/2025 18:11:46] code 404, message File not found
+::1 - - [06/Jun/2025 18:11:46] code 404, message File not found
+::1 - - [06/Jun/2025 18:11:46] "GET /apple-touch-icon.png HTTP/1.1" 404 -
+::1 - - [06/Jun/2025 18:11:46] "GET /favicon.ico HTTP/1.1" 404 -
+::1 - - [06/Jun/2025 18:11:49] "GET /fix-timeout.html HTTP/1.1" 200 -
+::1 - - [06/Jun/2025 18:15:21] "GET /verify-firebase.html HTTP/1.1" 200 -
+::1 - - [06/Jun/2025 18:18:12] "GET /verify-firebase.html HTTP/1.1" 200 -
+::1 - - [06/Jun/2025 18:18:26] "GET /verify-firebase.html HTTP/1.1" 200 -
+::1 - - [06/Jun/2025 18:19:46] "GET /simple-test.html HTTP/1.1" 200 -
+::1 - - [06/Jun/2025 18:19:55] "GET /verify-firebase.html HTTP/1.1" 200 -
+::1 - - [06/Jun/2025 18:21:08] "GET /debug.html HTTP/1.1" 200 -
+::1 - - [06/Jun/2025 18:22:20] "GET /debug.html HTTP/1.1" 200 -
+::1 - - [06/Jun/2025 18:22:38] "GET /fix-timeout.html HTTP/1.1" 200 -
+::1 - - [06/Jun/2025 18:24:29] "GET /verify-cdn-config.html HTTP/1.1" 200 -
+::1 - - [06/Jun/2025 18:28:30] "GET /index.html HTTP/1.1" 200 -
+::1 - - [06/Jun/2025 18:28:30] "GET /css/styles.css HTTP/1.1" 304 -
+::1 - - [06/Jun/2025 18:28:30] "GET /js/firebase-config.js HTTP/1.1" 200 -
+::1 - - [06/Jun/2025 18:28:30] "GET /js/main.js HTTP/1.1" 304 -

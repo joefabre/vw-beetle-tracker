@@ -167,6 +167,140 @@ input, select, textarea {
     }
 }
 
+/* ---------- Data Management Styles ---------- */
+.data-section {
+    margin-bottom: var(--spacing-xl);
+    padding-bottom: var(--spacing-lg);
+    border-bottom: 1px solid var(--light-border);
+}
+
+.data-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.import-section {
+    margin-top: var(--spacing-lg);
+}
+
+.file-input {
+    margin-bottom: var(--spacing-sm);
+    border: 2px dashed var(--light-border);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-md);
+    background-color: var(--light-bg);
+    transition: border-color 0.2s;
+}
+
+.file-input:hover,
+.file-input:focus {
+    border-color: var(--primary);
+    background-color: rgba(74, 108, 111, 0.05);
+}
+
+.import-options {
+    margin-top: var(--spacing-lg);
+    padding: var(--spacing-md);
+    background-color: rgba(74, 108, 111, 0.05);
+    border-radius: var(--border-radius);
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+    margin-right: var(--spacing-sm);
+    width: auto;
+}
+
+/* Stats Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-lg);
+}
+
+.stat-item {
+    text-align: center;
+    padding: var(--spacing-lg);
+    background-color: var(--light-bg);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--light-border);
+}
+
+.stat-number {
+    display: block;
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--primary);
+    margin-bottom: var(--spacing-xs);
+}
+
+.stat-label {
+    display: block;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 767px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--spacing-sm);
+    }
+    
+    .stat-item {
+        padding: var(--spacing-md);
+    }
+    
+    .stat-number {
+        font-size: 1.5rem;
+    }
+    
+    .stat-label {
+        font-size: 0.8rem;
+    }
+    
+    .import-section .form-group {
+        margin-bottom: var(--spacing-lg);
+    }
+    
+    .file-input {
+        padding: var(--spacing-lg);
+        font-size: 16px; /* Prevents iOS zoom */
+    }
+    
+    .checkbox-label {
+        font-size: 1rem;
+        padding: var(--spacing-sm);
+    }
+}
+
+/* File input button styling */
+.form-group {
+    position: relative;
+}
+
+.form-group button {
+    margin-top: var(--spacing-sm);
+}
+
+.form-group button:disabled {
+    background-color: var(--text-muted);
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.form-group button:disabled:hover {
+    background-color: var(--text-muted);
+}
+
 input:focus, select:focus, textarea:focus {
     border-color: var(--primary);
     outline: none;
@@ -1074,10 +1208,15 @@ tbody tr:hover {
         justify-self: center;
     }
     
+    /* Issue containers properly stacked on desktop */
+    #issue-tracking {
+        display: block;
+    }
+    
     .issue-list-container {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: var(--spacing-lg);
+        display: block;
+        margin-top: var(--spacing-lg);
+        width: 100%;
     }
 }
 

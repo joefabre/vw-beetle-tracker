@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Firebase Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-box {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin: 20px 0;
+        }
+        .result {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        #console {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            border: 1px solid #dee2e6;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-box">
+        <h1>🔧 Simple Firebase Test</h1>
+        <p>This page will test Firebase step by step with detailed console output.</p>
+        
+        <div id="results"></div>
+        
+        <button class="btn" onclick="runSimpleTest()">🚀 Run Test</button>
+        <button class="btn" onclick="clearResults()">🧹 Clear</button>
+        
+        <h3>Console Output:</h3>
+        <div id="console"></div>
+    </div>
+
+    <!-- Firebase CDN Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    
+    <script>
+        function log(message) {
+            const console = document.getElementById('console');
+            const timestamp = new Date().toLocaleTimeString();
+            console.textContent += `[${timestamp}] ${message}\n`;
+            console.scrollTop = console.scrollHeight;
+            console.log(message); // Also log to browser console
+        }
+        
+        function addResult(message, type) {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `result ${type}`;
+            div.textContent = message;
+            results.appendChild(div);
+        }
+        
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+            document.getElementById('console').textContent = '';
+        }
+        
+        async function runSimpleTest() {
+            clearResults();
+            log('Starting simple Firebase test...');
+            
+            try {
+                // Step 1: Check if Firebase is loaded
+                log('Step 1: Checking if Firebase is loaded...');
+                if (typeof firebase === 'undefined') {
+                    addResult('❌ Firebase library not loaded', 'error');
+                    log('ERROR: Firebase library not found');
+                    return;
+                }
+                addResult('✅ Firebase library loaded', 'success');
+                log('SUCCESS: Firebase library found');
+                
+                // Step 2: Initialize Firebase
+                log('Step 2: Initializing Firebase...');
+                const config = {
+                    apiKey: "AIzaSyDGcwqNB9njH0ZumQXKJhvFzl-VLY1u6PQ",
+                    authDomain: "vw-beetle-tracker.firebaseapp.com",
+                    projectId: "vw-beetle-tracker",
+                    storageBucket: "vw-beetle-tracker.firebasestorage.app",
+                    messagingSenderId: "720165426241",
+                    appId: "1:720165426241:web:4a416dd4136c09f17aa2c0",
+                    measurementId: "G-Z6LEP6KY00"
+                };
+                
+                log('Configuration: ' + JSON.stringify(config, null, 2));
+                
+                // Delete existing app if any
+                if (firebase.apps.length > 0) {
+                    log('Deleting existing Firebase app...');
+                    await firebase.app().delete();
+                }
+                
+                firebase.initializeApp(config);
+                addResult('✅ Firebase initialized', 'success');
+                log('SUCCESS: Firebase initialized');
+                
+                // Step 3: Get Firestore
+                log('Step 3: Getting Firestore instance...');
+                const db = firebase.firestore();
+                addResult('✅ Firestore instance created', 'success');
+                log('SUCCESS: Firestore instance created');
+                
+                // Step 4: Test write with timeout
+                log('Step 4: Testing write operation with 10 second timeout...');
+                const testDoc = db.collection('simple-test').doc('test-doc');
+                
+                const writePromise = testDoc.set({
+                    timestamp: new Date().toISOString(),
+                    test: 'simple-test-write',
+                    browser: navigator.userAgent,
+                    url: window.location.href
+                });
+                
+                const timeoutPromise = new Promise((_, reject) => {
+                    setTimeout(() => reject(new Error('Write operation timed out after 10 seconds')), 10000);
+                });
+                
+                await Promise.race([writePromise, timeoutPromise]);
+                addResult('✅ Write operation successful', 'success');
+                log('SUCCESS: Write operation completed');
+                
+                // Step 5: Test read with timeout
+                log('Step 5: Testing read operation with 10 second timeout...');
+                const readPromise = testDoc.get();
+                const readTimeoutPromise = new Promise((_, reject) => {
+                    setTimeout(() => reject(new Error('Read operation timed out after 10 seconds')), 10000);
+                });
+                
+                const doc = await Promise.race([readPromise, readTimeoutPromise]);
+                
+                if (doc.exists) {
+                    addResult('✅ Read operation successful', 'success');
+                    log('SUCCESS: Read operation completed');
+                    log('Document data: ' + JSON.stringify(doc.data(), null, 2));
+                } else {
+                    addResult('❌ Document not found after write', 'error');
+                    log('ERROR: Document not found after write');
+                }
+                
+                // Final result
+                addResult('🎉 ALL TESTS PASSED - Firebase is working!', 'success');
+                log('ALL TESTS COMPLETED SUCCESSFULLY');
+                
+            } catch (error) {
+                addResult(`❌ Test failed: ${error.message}`, 'error');
+                log(`ERROR: ${error.message}`);
+                log(`Error stack: ${error.stack}`);
+                
+                // Specific error analysis
+                if (error.message.includes('timeout')) {
+                    addResult('🔍 Diagnosis: Network timeout - check internet connection', 'info');
+                    log('DIAGNOSIS: Network timeout issue');
+                } else if (error.message.includes('offline')) {
+                    addResult('🔍 Diagnosis: Firebase client is offline', 'info');
+                    log('DIAGNOSIS: Firebase offline issue');
+                } else if (error.message.includes('permission')) {
+                    addResult('🔍 Diagnosis: Permission denied - check Firebase rules', 'info');
+                    log('DIAGNOSIS: Permission denied issue');
+                } else {
+                    addResult('🔍 Diagnosis: Unknown error - check console for details', 'info');
+                    log('DIAGNOSIS: Unknown error type');
+                }
+            }
+        }
+        
+        // Auto-run test when page loads
+        window.addEventListener('load', () => {
+            log('Page loaded, ready for testing');
+            addResult('ℹ️ Click "Run Test" to start Firebase verification', 'info');
+        });
+        
+        // Catch any uncaught errors
+        window.addEventListener('error', (event) => {
+            log(`Uncaught error: ${event.message}`);
+            addResult(`❌ JavaScript error: ${event.message}`, 'error');
+        });
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Diagnostic Tool</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .diagnostic-container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-result {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-family: monospace;
+        }
+        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .warning { background-color: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+        button {
+            background-color: #4a6c6f;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 5px;
+            font-size: 14px;
+        }
+        button:hover { background-color: #2a4c4f; }
+        .config-display {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            margin: 10px 0;
+            white-space: pre-wrap;
+        }
+        .fix-section {
+            background-color: #e7f3ff;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+            border-left: 4px solid #0066cc;
+        }
+    </style>
+</head>
+<body>
+    <div class="diagnostic-container">
+        <h1>🔧 Firebase Diagnostic Tool</h1>
+        <p>This tool will help diagnose the "client is offline" error and provide specific fixes.</p>
+        
+        <div id="results"></div>
+        
+        <button onclick="runFullDiagnostic()">🔍 Run Full Diagnostic</button>
+        <button onclick="testFirebaseUrls()">🌐 Test Firebase URLs</button>
+        <button onclick="enableOfflineSupport()">📱 Enable Offline Support</button>
+        <button onclick="forceOnlineMode()">🔄 Force Online Mode</button>
+        <button onclick="clearResults()">🧹 Clear Results</button>
+        
+        <div class="fix-section">
+            <h3>🎯 Common Fixes for "Client is Offline" Error:</h3>
+            <ol>
+                <li><strong>Network Issues:</strong> Check firewall/proxy settings</li>
+                <li><strong>Firebase Rules:</strong> Verify database security rules</li>
+                <li><strong>Offline Persistence:</strong> Enable offline mode</li>
+                <li><strong>Browser Cache:</strong> Clear browser cache and reload</li>
+                <li><strong>CORS Issues:</strong> Check domain configuration</li>
+            </ol>
+        </div>
+    </div>
+
+    <!-- Firebase CDN Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    
+    <script>
+        function addResult(message, type = 'info') {
+            const resultsDiv = document.getElementById('results');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `test-result ${type}`;
+            resultDiv.innerHTML = message;
+            resultsDiv.appendChild(resultDiv);
+            resultsDiv.scrollTop = resultsDiv.scrollHeight;
+        }
+        
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+        
+        async function runFullDiagnostic() {
+            clearResults();
+            addResult('🚀 Starting comprehensive Firebase diagnostic...', 'info');
+            addResult(`⏰ Time: ${new Date().toLocaleString()}`, 'info');
+            
+            // Test 1: Check if running locally
+            if (window.location.protocol === 'file:') {
+                addResult('⚠️ WARNING: Running from file:// protocol', 'warning');
+                addResult('🔧 SOLUTION: Serve from http://localhost or deploy to web server', 'warning');
+                addResult('💡 Try: python3 -m http.server 8000 or npx serve', 'info');
+            } else {
+                addResult('✅ Running from proper web server', 'success');
+            }
+            
+            // Test 2: Check Firebase library
+            if (typeof firebase === 'undefined') {
+                addResult('❌ Firebase library not loaded', 'error');
+                return;
+            }
+            addResult('✅ Firebase library loaded', 'success');
+            
+            // Test 3: Initialize Firebase with error handling
+            try {
+                const firebaseConfig = {
+                    apiKey: "AIzaSyDGcwqNB9njH0ZumQXKJhvFzl-VLY1u6PQ",
+                    authDomain: "vw-beetle-tracker.firebaseapp.com",
+                    projectId: "vw-beetle-tracker",
+                    storageBucket: "vw-beetle-tracker.firebasestorage.app",
+                    messagingSenderId: "720165426241",
+                    appId: "1:720165426241:web:4a416dd4136c09f17aa2c0",
+                    measurementId: "G-Z6LEP6KY00"
+                };
+                
+                addResult('📋 Firebase Config:', 'info');
+                addResult(`Project ID: ${firebaseConfig.projectId}`, 'info');
+                addResult(`Auth Domain: ${firebaseConfig.authDomain}`, 'info');
+                
+                // Initialize Firebase if not already done
+                if (!firebase.apps.length) {
+                    firebase.initializeApp(firebaseConfig);
+                    addResult('✅ Firebase app initialized', 'success');
+                } else {
+                    addResult('✅ Firebase app already initialized', 'success');
+                }
+                
+                // Get Firestore instance
+                const db = firebase.firestore();
+                addResult('✅ Firestore instance created', 'success');
+                
+                // Test 4: Check network connectivity to Firebase
+                addResult('🌐 Testing network connectivity to Firebase...', 'info');
+                
+                // Enable network (in case it was disabled)
+                await db.enableNetwork();
+                addResult('✅ Network enabled for Firestore', 'success');
+                
+                // Test 5: Try to connect with timeout
+                const timeoutPromise = new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error('Connection timeout after 10 seconds')), 10000)
+                );
+                
+                const connectTest = db.collection('vehicles').doc('connection-test');
+                
+                try {
+                    await Promise.race([
+                        connectTest.set({ 
+                            test: true, 
+                            timestamp: new Date().toISOString() 
+                        }),
+                        timeoutPromise
+                    ]);
+                    
+                    addResult('✅ Successfully connected to Firebase!', 'success');
+                    addResult('🎉 Database is working - the offline error might be intermittent', 'success');
+                    
+                    // Try to read back the test document
+                    const doc = await connectTest.get();
+                    if (doc.exists) {
+                        addResult('✅ Read-back test successful', 'success');
+                        addResult('📊 Test data found in Firebase', 'info');
+                    }
+                    
+                } catch (connectError) {
+                    addResult(`❌ Connection failed: ${connectError.message}`, 'error');
+                    
+                    if (connectError.message.includes('offline')) {
+                        addResult('🔍 DIAGNOSIS: Client is in offline mode', 'error');
+                        showOfflineFixes();
+                    } else if (connectError.message.includes('permission')) {
+                        addResult('🔍 DIAGNOSIS: Permission denied', 'error');
+                        showPermissionFixes();
+                    } else if (connectError.message.includes('timeout')) {
+                        addResult('🔍 DIAGNOSIS: Network timeout', 'error');
+                        showNetworkFixes();
+                    } else {
+                        addResult('🔍 DIAGNOSIS: Unknown connection error', 'error');
+                        showGeneralFixes();
+                    }
+                }
+                
+            } catch (error) {
+                addResult(`❌ Firebase initialization failed: ${error.message}`, 'error');
+                addResult(`🔍 Error code: ${error.code || 'unknown'}`, 'error');
+            }
+        }
+        
+        function showOfflineFixes() {
+            addResult('🛠️ FIXES FOR OFFLINE ERROR:', 'warning');
+            addResult('1. Check your internet connection', 'info');
+            addResult('2. Disable browser offline mode', 'info');
+            addResult('3. Clear browser cache and cookies', 'info');
+            addResult('4. Try in incognito/private mode', 'info');
+            addResult('5. Check firewall/proxy settings', 'info');
+            addResult('6. Try enabling offline persistence (see button above)', 'info');
+        }
+        
+        function showPermissionFixes() {
+            addResult('🛠️ FIXES FOR PERMISSION ERROR:', 'warning');
+            addResult('1. Check Firebase Security Rules', 'info');
+            addResult('2. Ensure rules allow read/write access', 'info');
+            addResult('3. Consider enabling authentication', 'info');
+        }
+        
+        function showNetworkFixes() {
+            addResult('🛠️ FIXES FOR NETWORK TIMEOUT:', 'warning');
+            addResult('1. Check DNS settings', 'info');
+            addResult('2. Try different network (mobile hotspot)', 'info');
+            addResult('3. Disable VPN if active', 'info');
+            addResult('4. Check corporate firewall settings', 'info');
+        }
+        
+        function showGeneralFixes() {
+            addResult('🛠️ GENERAL TROUBLESHOOTING:', 'warning');
+            addResult('1. Reload the page', 'info');
+            addResult('2. Try different browser', 'info');
+            addResult('3. Check browser console for errors', 'info');
+            addResult('4. Verify Firebase project is active', 'info');
+        }
+        
+        async function testFirebaseUrls() {
+            addResult('🌐 Testing Firebase service URLs...', 'info');
+            
+            const urls = [
+                'https://firestore.googleapis.com',
+                'https://vw-beetle-tracker.firebaseapp.com',
+                'https://vw-beetle-tracker-default-rtdb.firebaseio.com'
+            ];
+            
+            for (const url of urls) {
+                try {
+                    const response = await fetch(url, { mode: 'no-cors' });
+                    addResult(`✅ ${url} - Accessible`, 'success');
+                } catch (error) {
+                    addResult(`❌ ${url} - Failed: ${error.message}`, 'error');
+                }
+            }
+        }
+        
+        async function enableOfflineSupport() {
+            try {
+                addResult('📱 Enabling offline persistence...', 'info');
+                
+                const firebaseConfig = {
+                    apiKey: "AIzaSyDGcwqNB9njH0ZumQXKJhvFzl-VLY1u6PQ",
+                    authDomain: "vw-beetle-tracker.firebaseapp.com",
+                    projectId: "vw-beetle-tracker",
+                    storageBucket: "vw-beetle-tracker.firebasestorage.app",
+                    messagingSenderId: "720165426241",
+                    appId: "1:720165426241:web:4a416dd4136c09f17aa2c0",
+                    measurementId: "G-Z6LEP6KY00"
+                };
+                
+                if (!firebase.apps.length) {
+                    firebase.initializeApp(firebaseConfig);
+                }
+                
+                const db = firebase.firestore();
+                
+                // Enable offline persistence
+                await db.enablePersistence();
+                addResult('✅ Offline persistence enabled successfully', 'success');
+                addResult('💡 Your app will now work offline and sync when online', 'info');
+                
+            } catch (error) {
+                if (error.code === 'failed-precondition') {
+                    addResult('⚠️ Offline persistence failed: Multiple tabs open', 'warning');
+                    addResult('💡 Close other tabs and try again', 'info');
+                } else if (error.code === 'unimplemented') {
+                    addResult('⚠️ Offline persistence not supported in this browser', 'warning');
+                } else {
+                    addResult(`❌ Offline persistence failed: ${error.message}`, 'error');
+                }
+            }
+        }
+        
+        async function forceOnlineMode() {
+            try {
+                addResult('🔄 Forcing online mode...', 'info');
+                
+                const firebaseConfig = {
+                    apiKey: "AIzaSyDGcwqNB9njH0ZumQXKJhvFzl-VLY1u6PQ",
+                    authDomain: "vw-beetle-tracker.firebaseapp.com",
+                    projectId: "vw-beetle-tracker",
+                    storageBucket: "vw-beetle-tracker.firebasestorage.app",
+                    messagingSenderId: "720165426241",
+                    appId: "1:720165426241:web:4a416dd4136c09f17aa2c0",
+                    measurementId: "G-Z6LEP6KY00"
+                };
+                
+                if (!firebase.apps.length) {
+                    firebase.initializeApp(firebaseConfig);
+                }
+                
+                const db = firebase.firestore();
+                
+                // Disable and re-enable network
+                await db.disableNetwork();
+                addResult('🔌 Network disabled', 'info');
+                
+                setTimeout(async () => {
+                    await db.enableNetwork();
+                    addResult('✅ Network re-enabled - should be online now', 'success');
+                    
+                    // Test connection
+                    try {
+                        await db.collection('test').doc('connection').set({ 
+                            timestamp: new Date().toISOString(),
+                            test: 'force-online'
+                        });
+                        addResult('🎉 Force online successful - database is working!', 'success');
+                    } catch (error) {
+                        addResult(`❌ Still offline after force: ${error.message}`, 'error');
+                    }
+                }, 2000);
+                
+            } catch (error) {
+                addResult(`❌ Force online failed: ${error.message}`, 'error');
+            }
+        }
+        
+        // Auto-run diagnostic on page load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                addResult('🏁 Firebase Diagnostic Tool loaded', 'info');
+                addResult('💡 Click "Run Full Diagnostic" to start troubleshooting', 'info');
+            }, 500);
+        });
+    </script>
+</body>
+</html>
+

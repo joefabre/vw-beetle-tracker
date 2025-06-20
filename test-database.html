@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VW Beetle Tracker - Database Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .test-container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-result {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-family: monospace;
+        }
+        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .warning { background-color: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+        button {
+            background-color: #4a6c6f;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        button:hover { background-color: #2a4c4f; }
+        .loading { color: #6c757d; }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🚗 VW Beetle Tracker - Database Connection Test</h1>
+        <p>This page will test your Firebase database connection and show detailed results.</p>
+        
+        <div id="test-results"></div>
+        
+        <button onclick="runCompleteTest()">🔄 Run Complete Database Test</button>
+        <button onclick="testReadData()">📖 Test Read Data</button>
+        <button onclick="testWriteData()">✍️ Test Write Data</button>
+        <button onclick="clearResults()">🧹 Clear Results</button>
+        
+        <hr style="margin: 30px 0;">
+        <p><strong>Test Status:</strong></p>
+        <div id="status">Click "Run Complete Database Test" to begin...</div>
+    </div>
+
+    <!-- Firebase CDN Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    
+    <!-- Firebase Configuration -->
+    <script src="js/firebase-config.js"></script>
+    
+    <script>
+        function addResult(message, type = 'info') {
+            const resultsDiv = document.getElementById('test-results');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `test-result ${type}`;
+            resultDiv.innerHTML = message;
+            resultsDiv.appendChild(resultDiv);
+            
+            // Auto-scroll to bottom
+            resultsDiv.scrollTop = resultsDiv.scrollHeight;
+        }
+        
+        function updateStatus(message) {
+            document.getElementById('status').innerHTML = message;
+        }
+        
+        function clearResults() {
+            document.getElementById('test-results').innerHTML = '';
+            updateStatus('Results cleared. Ready for new test.');
+        }
+        
+        async function runCompleteTest() {
+            clearResults();
+            updateStatus('🔄 Running complete database test...');
+            
+            addResult('🚀 Starting Firebase Database Test...', 'info');
+            addResult(`⏰ Test Time: ${new Date().toLocaleString()}`, 'info');
+            
+            // Test 1: Check if Firebase is initialized
+            if (typeof firebase === 'undefined') {
+                addResult('❌ CRITICAL: Firebase library not loaded', 'error');
+                updateStatus('❌ Test FAILED - Firebase not loaded');
+                return;
+            }
+            addResult('✅ Firebase library loaded successfully', 'success');
+            
+            // Test 2: Check if database is available
+            if (!window.db) {
+                addResult('❌ CRITICAL: Firebase database not initialized', 'error');
+                updateStatus('❌ Test FAILED - Database not initialized');
+                return;
+            }
+            addResult('✅ Firebase database initialized', 'success');
+            
+            // Test 3: Test connection
+            try {
+                addResult('🔍 Testing database connection...', 'info');
+                
+                // Try to read existing data
+                const testDoc = await db.collection('vehicles').doc('beetle-1969').get();
+                
+                if (testDoc.exists) {
+                    const data = testDoc.data();
+                    addResult('✅ READ TEST: Successfully connected to database', 'success');
+                    addResult(`📊 Found existing data with keys: ${Object.keys(data).join(', ')}`, 'info');
+                    
+                    if (data.vehicleInfo) {
+                        addResult(`🚗 Vehicle: ${data.vehicleInfo.year} ${data.vehicleInfo.make} ${data.vehicleInfo.model}`, 'info');
+                    }
+                    if (data.maintenance) {
+                        addResult(`🔧 Maintenance records: ${data.maintenance.length}`, 'info');
+                    }
+                    if (data.issues) {
+                        addResult(`⚠️ Issues tracked: ${data.issues.length}`, 'info');
+                    }
+                } else {
+                    addResult('⚡ READ TEST: Connected successfully (no data found yet)', 'warning');
+                    addResult('ℹ️ This is normal for a new setup', 'info');
+                }
+                
+                // Test 4: Test write capability
+                addResult('✍️ Testing write capability...', 'info');
+                
+                const testData = {
+                    connectionTest: {
+                        timestamp: new Date().toISOString(),
+                        testId: Math.random().toString(36).substring(7),
+                        status: 'connected'
+                    }
+                };
+                
+                await db.collection('vehicles').doc('beetle-1969').set(testData, { merge: true });
+                addResult('✅ WRITE TEST: Successfully wrote test data to database', 'success');
+                
+                // Test 5: Verify write by reading back
+                addResult('🔍 Verifying write by reading back...', 'info');
+                const verifyDoc = await db.collection('vehicles').doc('beetle-1969').get();
+                const verifyData = verifyDoc.data();
+                
+                if (verifyData.connectionTest && verifyData.connectionTest.status === 'connected') {
+                    addResult('✅ VERIFY TEST: Write operation confirmed successful', 'success');
+                    addResult(`📝 Test ID: ${verifyData.connectionTest.testId}`, 'info');
+                } else {
+                    addResult('❌ VERIFY TEST: Could not confirm write operation', 'error');
+                }
+                
+                addResult('🎉 ALL TESTS PASSED! Your database is working perfectly.', 'success');
+                updateStatus('✅ All tests PASSED - Database is working!');
+                
+            } catch (error) {
+                addResult(`❌ DATABASE ERROR: ${error.message}`, 'error');
+                addResult(`🔍 Error details: ${error.code || 'unknown'}`, 'error');
+                updateStatus('❌ Test FAILED - See error details above');
+            }
+        }
+        
+        async function testReadData() {
+            addResult('📖 Testing read operation...', 'info');
+            
+            try {
+                const doc = await db.collection('vehicles').doc('beetle-1969').get();
+                if (doc.exists) {
+                    const data = doc.data();
+                    addResult('✅ Read successful', 'success');
+                    addResult(`📊 Data keys: ${Object.keys(data).join(', ')}`, 'info');
+                } else {
+                    addResult('⚠️ No data found (document does not exist)', 'warning');
+                }
+            } catch (error) {
+                addResult(`❌ Read failed: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testWriteData() {
+            addResult('✍️ Testing write operation...', 'info');
+            
+            try {
+                const testData = {
+                    manualTest: {
+                        timestamp: new Date().toISOString(),
+                        note: 'Manual test write'
+                    }
+                };
+                
+                await db.collection('vehicles').doc('beetle-1969').set(testData, { merge: true });
+                addResult('✅ Write successful', 'success');
+            } catch (error) {
+                addResult(`❌ Write failed: ${error.message}`, 'error');
+            }
+        }
+        
+        // Auto-run test when page loads
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                addResult('🏁 Page loaded. Firebase initialization should be complete.', 'info');
+                if (window.db) {
+                    addResult('✅ Database object found. Ready to test!', 'success');
+                } else {
+                    addResult('❌ Database object not found. Check Firebase setup.', 'error');
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
+

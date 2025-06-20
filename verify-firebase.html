@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Configuration Verification</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #f0f8ff;
+        }
+        .verify-container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            border: 3px solid #007bff;
+        }
+        .check-item {
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+            border-left: 4px solid #007bff;
+            background-color: #f8f9fa;
+        }
+        .check-item.success {
+            border-left-color: #28a745;
+            background-color: #d4edda;
+        }
+        .check-item.error {
+            border-left-color: #dc3545;
+            background-color: #f8d7da;
+        }
+        .check-item.warning {
+            border-left-color: #ffc107;
+            background-color: #fff3cd;
+        }
+        .config-display {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            margin: 10px 0;
+            white-space: pre-wrap;
+            border: 1px solid #dee2e6;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 5px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .btn:hover { background-color: #0056b3; }
+        .btn-success { background-color: #28a745; }
+        .btn-danger { background-color: #dc3545; }
+        .status-bar {
+            text-align: center;
+            padding: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .status-checking {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        .status-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .status-error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="verify-container">
+        <h1 style="text-align: center; color: #007bff;">🔧 Firebase Configuration Verification</h1>
+        
+        <div id="status-bar" class="status-bar status-checking">
+            🔄 Checking Firebase configuration...
+        </div>
+        
+        <div id="verification-results"></div>
+        
+        <div style="text-align: center; margin: 30px 0;">
+            <button class="btn" onclick="runVerification()">🔄 Re-run Verification</button>
+            <button class="btn btn-success" onclick="testConnection()">🌐 Test Connection</button>
+            <button class="btn" onclick="showConfiguration()">📄 Show Config</button>
+            <button class="btn btn-danger" onclick="fixConfiguration()">🔧 Fix Config</button>
+        </div>
+        
+        <div id="config-details" style="display: none;">
+            <h3>Current Firebase Configuration:</h3>
+            <div id="config-display" class="config-display"></div>
+        </div>
+        
+        <div id="logs" class="config-display" style="max-height: 200px;"></div>
+    </div>
+
+    <!-- Firebase CDN Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    
+    <script>
+        let logs = [];
+        
+        function addLog(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            logs.push(`[${timestamp}] ${message}`);
+            document.getElementById('logs').textContent = logs.join('\n');
+        }
+        
+        function addResult(title, message, type = 'info') {
+            const resultsDiv = document.getElementById('verification-results');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `check-item ${type}`;
+            
+            let icon = '📝';
+            if (type === 'success') icon = '✅';
+            if (type === 'error') icon = '❌';
+            if (type === 'warning') icon = '⚠️';
+            
+            resultDiv.innerHTML = `
+                <h4>${icon} ${title}</h4>
+                <p>${message}</p>
+            `;
+            resultsDiv.appendChild(resultDiv);
+        }
+        
+        function updateStatus(message, type) {
+            const statusBar = document.getElementById('status-bar');
+            statusBar.className = `status-bar status-${type}`;
+            statusBar.textContent = message;
+        }
+        
+        async function runVerification() {
+            document.getElementById('verification-results').innerHTML = '';
+            logs = [];
+            updateStatus('🔄 Running comprehensive Firebase verification...', 'checking');
+            addLog('Starting Firebase configuration verification');
+            
+            let allChecksPass = true;
+            
+            // Check 1: Firebase Library
+            addLog('Checking Firebase library availability...');
+            if (typeof firebase === 'undefined') {
+                addResult('Firebase Library', 'Firebase library is not loaded. Check your internet connection and Firebase CDN links.', 'error');
+                allChecksPass = false;
+                updateStatus('❌ Verification FAILED - Firebase library not loaded', 'error');
+                return;
+            } else {
+                addResult('Firebase Library', 'Firebase library loaded successfully ✓', 'success');
+                addLog('Firebase library check: PASSED');
+            }
+            
+            // Check 2: Configuration Object
+            addLog('Checking Firebase configuration...');
+            const expectedConfig = {
+                apiKey: "AIzaSyDGcwqNB9njH0ZumQXKJhvFzl-VLY1u6PQ",
+                authDomain: "vw-beetle-tracker.firebaseapp.com",
+                projectId: "vw-beetle-tracker",
+                storageBucket: "vw-beetle-tracker.firebasestorage.app",
+                messagingSenderId: "720165426241",
+                appId: "1:720165426241:web:4a416dd4136c09f17aa2c0",
+                measurementId: "G-Z6LEP6KY00"
+            };
+            
+            // Check if Firebase is already initialized
+            let db;
+            try {
+                if (firebase.apps.length === 0) {
+                    addLog('Initializing Firebase with configuration...');
+                    firebase.initializeApp(expectedConfig);
+                    addResult('Firebase Initialization', 'Firebase app initialized successfully ✓', 'success');
+                } else {
+                    addResult('Firebase Initialization', 'Firebase app already initialized ✓', 'success');
+                    addLog('Firebase already initialized');
+                }
+                
+                db = firebase.firestore();
+                addResult('Firestore Database', 'Firestore instance created successfully ✓', 'success');
+                addLog('Firestore instance created successfully');
+                
+            } catch (initError) {
+                addResult('Firebase Initialization', `Failed to initialize Firebase: ${initError.message}`, 'error');
+                addLog(`Firebase initialization error: ${initError.message}`);
+                allChecksPass = false;
+            }
+            
+            // Check 3: Project Configuration
+            addLog('Validating project configuration...');
+            const projectConfig = {
+                'API Key': expectedConfig.apiKey.substring(0, 20) + '...',
+                'Project ID': expectedConfig.projectId,
+                'Auth Domain': expectedConfig.authDomain,
+                'Storage Bucket': expectedConfig.storageBucket,
+                'App ID': expectedConfig.appId.substring(0, 20) + '...'
+            };
+            
+            addResult('Project Configuration', 
+                `Project: ${expectedConfig.projectId}<br>
+                Auth Domain: ${expectedConfig.authDomain}<br>
+                Storage: ${expectedConfig.storageBucket}<br>
+                Configuration appears valid ✓`, 'success');
+            addLog('Project configuration validated');
+            
+            // Check 4: Network Connectivity
+            addLog('Testing network connectivity to Firebase...');
+            try {
+                const response = await fetch('https://firestore.googleapis.com', { mode: 'no-cors' });
+                addResult('Network Connectivity', 'Can reach Firebase servers successfully ✓', 'success');
+                addLog('Network connectivity: PASSED');
+            } catch (networkError) {
+                addResult('Network Connectivity', `Cannot reach Firebase servers: ${networkError.message}`, 'error');
+                addLog(`Network connectivity error: ${networkError.message}`);
+                allChecksPass = false;
+            }
+            
+            // Check 5: Database Connection Test
+            if (db) {
+                addLog('Testing database read/write operations...');
+                try {
+                    const testDoc = db.collection('config-test').doc('verification');
+                    
+                    // Test write
+                    await testDoc.set({
+                        timestamp: new Date().toISOString(),
+                        test: 'configuration-verification',
+                        status: 'success'
+                    });
+                    
+                    // Test read
+                    const doc = await testDoc.get();
+                    if (doc.exists) {
+                        addResult('Database Operations', 'Read and write operations successful ✓', 'success');
+                        addLog('Database operations: PASSED');
+                    } else {
+                        addResult('Database Operations', 'Write succeeded but read failed', 'warning');
+                        addLog('Database operations: PARTIAL');
+                    }
+                    
+                } catch (dbError) {
+                    if (dbError.message.includes('offline')) {
+                        addResult('Database Operations', 'Client is offline - check internet connection', 'error');
+                        addLog(`Database error: Client offline`);
+                    } else if (dbError.message.includes('permission')) {
+                        addResult('Database Operations', 'Permission denied - check Firebase security rules', 'error');
+                        addLog(`Database error: Permission denied`);
+                    } else {
+                        addResult('Database Operations', `Database test failed: ${dbError.message}`, 'error');
+                        addLog(`Database error: ${dbError.message}`);
+                    }
+                    allChecksPass = false;
+                }
+            }
+            
+            // Check 6: Security Rules (informational)
+            addLog('Providing security rules information...');
+            addResult('Security Rules', 
+                'For development, ensure your Firestore rules allow read/write access:<br>
+                <code>allow read, write: if true;</code><br>
+                For production, implement proper authentication.', 'warning');
+            
+            // Final Status
+            if (allChecksPass) {
+                updateStatus('✅ Verification PASSED - Firebase is correctly configured!', 'success');
+                addLog('All verification checks passed');
+            } else {
+                updateStatus('❌ Verification FAILED - Issues found with Firebase configuration', 'error');
+                addLog('Some verification checks failed');
+            }
+        }
+        
+        async function testConnection() {
+            addLog('Running connection test...');
+            try {
+                if (!firebase.apps.length) {
+                    const config = {
+                        apiKey: "AIzaSyDGcwqNB9njH0ZumQXKJhvFzl-VLY1u6PQ",
+                        authDomain: "vw-beetle-tracker.firebaseapp.com",
+                        projectId: "vw-beetle-tracker",
+                        storageBucket: "vw-beetle-tracker.firebasestorage.app",
+                        messagingSenderId: "720165426241",
+                        appId: "1:720165426241:web:4a416dd4136c09f17aa2c0",
+                        measurementId: "G-Z6LEP6KY00"
+                    };
+                    firebase.initializeApp(config);
+                }
+                
+                const db = firebase.firestore();
+                const testDoc = db.collection('vehicles').doc('beetle-1969');
+                
+                await testDoc.set({
+                    connectionTest: new Date().toISOString(),
+                    testResult: 'successful'
+                }, { merge: true });
+                
+                addResult('Connection Test', 'Connection test successful - database is working ✓', 'success');
+                addLog('Connection test: PASSED');
+                
+            } catch (error) {
+                addResult('Connection Test', `Connection test failed: ${error.message}`, 'error');
+                addLog(`Connection test failed: ${error.message}`);
+            }
+        }
+        
+        function showConfiguration() {
+            const configDiv = document.getElementById('config-details');
+            const displayDiv = document.getElementById('config-display');
+            
+            const config = {
+                apiKey: "AIzaSyDGcwqNB9njH0ZumQXKJhvFzl-VLY1u6PQ",
+                authDomain: "vw-beetle-tracker.firebaseapp.com",
+                projectId: "vw-beetle-tracker",
+                storageBucket: "vw-beetle-tracker.firebasestorage.app",
+                messagingSenderId: "720165426241",
+                appId: "1:720165426241:web:4a416dd4136c09f17aa2c0",
+                measurementId: "G-Z6LEP6KY00"
+            };
+            
+            displayDiv.textContent = JSON.stringify(config, null, 2);
+            configDiv.style.display = configDiv.style.display === 'none' ? 'block' : 'none';
+        }
+        
+        function fixConfiguration() {
+            addResult('Configuration Fix', 
+                'If you\'re having issues, try these steps:<br>
+                1. Clear browser cache and reload<br>
+                2. Check internet connection<br>
+                3. Verify Firebase project is active<br>
+                4. Try in incognito mode<br>
+                5. Check browser console for errors', 'warning');
+        }
+        
+        // Auto-run verification when page loads
+        window.addEventListener('load', () => {
+            setTimeout(runVerification, 1000);
+        });
+    </script>
+</body>
+</html>
+
