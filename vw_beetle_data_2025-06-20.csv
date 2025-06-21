@@ -1,0 +1,28 @@
+# VW Beetle Tracker Data Export
+# Export Date: 6/20/2025, 5:56:05 AM
+# Vehicle: 1969 Volkswagen Beetle
+# 
+
+[VEHICLE_INFO]
+Field,Value
+Year,1969
+Make,Volkswagen
+Model,Beetle
+VIN,""
+Mileage,178
+
+[MAINTENANCE_RECORDS]
+ID,Date,Type,Mileage,Notes,Cost,Timestamp
+
+[ISSUES]
+ID,Date,Description,Priority,Resolved,ResolvedDate,LastModified,Timestamp
+mbbb05xq7j09peywo1f,2025-05-22,"Clutch and shifter seem to be failing. When I push in clutch if feels as if it is partially engaging. Matt is working the issue on his dime. Nice. In progress...",critical,false,,2025-06-07T01:29:49.466Z,2025-05-30T21:17:07.214Z
+m9j5cm5asjjfj42k3am,2025-04-15,"Driver side window ""cushion"" is loose needs glue. Fixed with JB Weld.",low,true,2025-06-07T01:47:53.111Z,2025-06-07T01:47:28.305Z,2025-04-15T23:41:35.134Z
+m9gl6bs0mjzfd1fpiuk,2025-04-14,"Driverside speaker cover is loose. Went to Car Toys and they tried to pop it back in place worked, but still pops off. I will JB Weld it.",low,false,,2025-06-06T22:30:47.034Z,2025-04-14T04:41:17.088Z
+m9gl59ujeuf79fj7wsg,2025-04-14,"Top latch is working intermittently. Needs to be adjusted. Screw is loose needs replacement or JB Weld.",medium,false,,2025-06-06T22:23:17.876Z,2025-04-14T04:40:27.931Z
+m9cp4kuczdcl4rkq62,2025-04-11,"Need to set the miles for tune up, oil change, valve adjustments, and break inspection",low,false,,,2025-04-11T11:20:49.284Z
+m9c54zq8pert62y90t,2025-04-11,"Driver side tire seems to collect more carbon from breaks.",low,false,,,2025-04-11T02:01:16.256Z
+m9c54byv1ter71znww,2025-04-11,"Windshield wipers seem a bit delicate to operate.",low,false,,,2025-04-11T02:00:45.463Z
+m9c53ok2i4qgpayi5bc,2025-04-11,"Passenger window is stuck. Matt is ordering parts.",low,false,,2025-06-06T22:22:10.889Z,2025-04-11T02:00:15.122Z
+m9c53e756kvtbxbf14r,2025-04-11,"Trunk latch is sticking. There is a workaround to open it.",low,false,,,2025-04-11T02:00:01.697Z
+m9c4thdj9n0x04l9bz4,2025-04-11,"Gas tank has potential leak, gas is eroding the paint at the spout.",medium,false,,,2025-04-11T01:52:19.255Z
